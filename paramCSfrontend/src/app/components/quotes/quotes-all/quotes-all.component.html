@@ -1,0 +1,41 @@
+<c-card>
+  <c-card-header>
+    <strong>All Quotations</strong>
+  </c-card-header>
+  <c-card-body>
+    <div *ngIf="loading" class="text-center">
+      <c-spinner></c-spinner>
+    </div>
+    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+    <table cTable *ngIf="!loading && !error">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Customer</th>
+          <th>Date</th>
+          <th>Total Value</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let quotation of quotations">
+          <td>{{ quotation.QuoteId }}</td>
+          <td>{{ quotation.CustomerNumber }}</td>
+          <td>{{ quotation.Date | date }}</td>
+          <td>{{ quotation.total_value | currency }}</td>
+          <td>{{ quotation.QStatusID.QStatusName }}</td>
+          <td>
+            <button cButton color="primary" size="sm" class="me-2" [routerLink]="['/quotes', quotation.QuoteId]">View</button>
+            <button cButton color="warning" size="sm" class="me-2" [routerLink]="['/quotes', quotation.QuoteId, 'edit']">Edit</button>
+            <button cButton color="danger" size="sm" (click)="deleteQuotation(quotation.QuoteId)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="!loading && !error && quotations.length === 0" class="alert alert-info mt-3">
+      No quotations found.
+    </div>
+    <button cButton color="primary" [routerLink]="['/quotes/create']" class="mt-3">Create New Quotation</button>
+  </c-card-body>
+</c-card>

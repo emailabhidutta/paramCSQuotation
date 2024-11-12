@@ -1,0 +1,118 @@
+<div *ngIf="loading" class="text-center my-3">
+  <c-spinner></c-spinner>
+</div>
+
+<div *ngIf="error" class="alert alert-danger my-3">
+  {{ error }}
+</div>
+
+<div *ngIf="!loading && !error">
+  <c-row>
+    <c-col sm="6" lg="3">
+      <c-widget-stat-a title="Total Quotes"
+                       [value]="dashboardData.totalQuotes.toString()"
+                       color="primary">
+        <svg cWidgetStatAIcon width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      </c-widget-stat-a>
+    </c-col>
+    <c-col sm="6" lg="3">
+      <c-widget-stat-a title="Accepted Quotes"
+                       [value]="dashboardData.acceptedQuotes.toString()"
+                       color="success">
+        <svg cWidgetStatAIcon width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+      </c-widget-stat-a>
+    </c-col>
+    <c-col sm="6" lg="3">
+      <c-widget-stat-a title="Pending Quotes"
+                       [value]="dashboardData.pendingQuotes.toString()"
+                       color="warning">
+        <svg cWidgetStatAIcon width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      </c-widget-stat-a>
+    </c-col>
+    <c-col sm="6" lg="3">
+      <c-widget-stat-a title="Total Value"
+                       [value]="formatCurrency(dashboardData.totalValue)"
+                       color="info">
+        <svg cWidgetStatAIcon width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-dollar-sign"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+      </c-widget-stat-a>
+    </c-col>
+  </c-row>
+
+  <c-card class="mb-4">
+    <c-card-body>
+      <c-row>
+        <c-col sm="5">
+          <h4 class="card-title mb-0">Quotes Overview</h4>
+          <div class="small text-medium-emphasis">{{currentYear}}</div>
+        </c-col>
+        <c-col sm="7" class="d-none d-md-block">
+          <button cButton color="primary" class="float-end" (click)="refreshDashboard()">
+            <svg cIcon name="cilCloudDownload"></svg>
+          </button>
+        </c-col>
+      </c-row>
+      <div class="chart-wrapper mt-3" style="height:300px;">
+        <canvas baseChart class="chart"
+                [data]="lineChartData"
+                [options]="lineChartOptions"
+                [type]="'line'">
+        </canvas>
+      </div>
+    </c-card-body>
+  </c-card>
+
+  <c-row>
+    <c-col sm="6" lg="6">
+      <c-card class="mb-4">
+        <c-card-header>Recent Quotes</c-card-header>
+        <c-card-body>
+          <table cTable>
+            <thead>
+              <tr>
+                <th>Quote ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let quote of recentQuotes">
+                <td>{{quote.id}}</td>
+                <td>{{quote.customerName}}</td>
+                <td>{{quote.date | date:'short'}}</td>
+                <td>
+                  <c-badge [color]="getStatusColor(quote.status)">
+                    {{quote.status}}
+                  </c-badge>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </c-card-body>
+      </c-card>
+    </c-col>
+    <c-col sm="6" lg="6">
+      <c-card class="mb-4">
+        <c-card-header>Top Customers</c-card-header>
+        <c-card-body>
+          <table cTable>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Total Quotes</th>
+                <th>Total Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let customer of topCustomers">
+                <td>{{customer.name}}</td>
+                <td>{{customer.totalQuotes}}</td>
+                <td>{{formatCurrency(customer.totalValue)}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </c-card-body>
+      </c-card>
+    </c-col>
+  </c-row>
+</div>

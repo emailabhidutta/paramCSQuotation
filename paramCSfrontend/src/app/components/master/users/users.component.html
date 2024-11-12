@@ -1,0 +1,78 @@
+<c-card>
+  <c-card-header>
+    <strong>{{ editingUser ? 'Edit User' : 'Create User' }}</strong>
+  </c-card-header>
+  <c-card-body>
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <c-input-group class="mb-3">
+        <span cInputGroupText>
+          <svg cIcon name="cilUser"></svg>
+        </span>
+        <input cFormControl placeholder="Username" formControlName="username" />
+      </c-input-group>
+      <c-input-group class="mb-3">
+        <span cInputGroupText>&#64;</span>
+        <input cFormControl placeholder="Email" formControlName="email" />
+      </c-input-group>
+      <c-input-group class="mb-3" *ngIf="!editingUser">
+        <span cInputGroupText>
+          <svg cIcon name="cilLockLocked"></svg>
+        </span>
+        <input cFormControl placeholder="Password" type="password" formControlName="password" />
+      </c-input-group>
+      <c-input-group class="mb-3">
+        <span cInputGroupText>
+          <svg cIcon name="cilPeople"></svg>
+        </span>
+        <select cSelect formControlName="role">
+          <option value="">Select Role</option>
+          <option value="admin">Admin</option>
+          <option value="user">User</option>
+        </select>
+      </c-input-group>
+      <div class="d-grid">
+        <button cButton color="primary" type="submit" [disabled]="userForm.invalid">
+          {{ editingUser ? 'Update User' : 'Create User' }}
+        </button>
+        <button *ngIf="editingUser" cButton color="secondary" type="button" (click)="cancelEdit()" class="mt-2">
+          Cancel Edit
+        </button>
+      </div>
+    </form>
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3">{{ errorMessage }}</div>
+    <div *ngIf="successMessage" class="alert alert-success mt-3">{{ successMessage }}</div>
+  </c-card-body>
+</c-card>
+
+<!-- User List -->
+<c-card class="mt-4">
+  <c-card-header>
+    <strong>User List</strong>
+  </c-card-header>
+  <c-card-body>
+    <table cTable>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td>
+            <button cButton color="primary" size="sm" class="me-2" (click)="editUser(user)">Edit</button>
+            <button cButton color="danger" size="sm" (click)="deleteUser(user)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div *ngIf="users.length === 0" class="text-center mt-3">
+      No users found.
+    </div>
+  </c-card-body>
+</c-card>

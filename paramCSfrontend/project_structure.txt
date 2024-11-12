@@ -1,0 +1,112 @@
+Folder PATH listing for volume Projects
+Volume serial number is 8E0B-3E79
+E:\PARAMCS\PARAMCSQUOTATION\PARAMCSFRONTEND\SRC
+|   index.html
+|   main.ts
+|   styles.css
+|   
+\---app
+    |   app-routing.module.ts
+    |   app.component.css
+    |   app.component.html
+    |   app.component.spec.ts
+    |   app.component.ts
+    |   app.module.ts
+    |   auth.interceptor.ts
+    |   nav.ts
+    |   
+    +---components
+    |   +---dashboard
+    |   |       dashboard.component.css
+    |   |       dashboard.component.html
+    |   |       dashboard.component.spec.ts
+    |   |       dashboard.component.ts
+    |   |       
+    |   +---footer
+    |   |       footer.component.css
+    |   |       footer.component.html
+    |   |       footer.component.spec.ts
+    |   |       footer.component.ts
+    |   |       
+    |   +---header
+    |   |       header.component.css
+    |   |       header.component.html
+    |   |       header.component.spec.ts
+    |   |       header.component.ts
+    |   |       
+    |   +---login
+    |   |       login.component.css
+    |   |       login.component.html
+    |   |       login.component.spec.ts
+    |   |       login.component.ts
+    |   |       
+    |   +---master
+    |   |   +---roles
+    |   |   |       roles.component.css
+    |   |   |       roles.component.html
+    |   |   |       roles.component.spec.ts
+    |   |   |       roles.component.ts
+    |   |   |       
+    |   |   \---users
+    |   |           users.component.css
+    |   |           users.component.html
+    |   |           users.component.spec.ts
+    |   |           users.component.ts
+    |   |           
+    |   \---quotes
+    |       +---quotation-detail
+    |       |       quotation-detail.component.css
+    |       |       quotation-detail.component.html
+    |       |       quotation-detail.component.spec.ts
+    |       |       quotation-detail.component.ts
+    |       |       
+    |       +---quotation-list
+    |       |       quotation-list.component.css
+    |       |       quotation-list.component.html
+    |       |       quotation-list.component.spec.ts
+    |       |       quotation-list.component.ts
+    |       |       
+    |       +---quote-create
+    |       |       quote-create.component.css
+    |       |       quote-create.component.html
+    |       |       quote-create.component.spec.ts
+    |       |       quote-create.component.ts
+    |       |       
+    |       +---quotes-accepted
+    |       |       quotes-accepted.component.css
+    |       |       quotes-accepted.component.html
+    |       |       quotes-accepted.component.spec.ts
+    |       |       quotes-accepted.component.ts
+    |       |       
+    |       +---quotes-all
+    |       |       quotes-all.component.css
+    |       |       quotes-all.component.html
+    |       |       quotes-all.component.spec.ts
+    |       |       quotes-all.component.ts
+    |       |       
+    |       +---quotes-cancelled
+    |       |       quotes-cancelled.component.css
+    |       |       quotes-cancelled.component.html
+    |       |       quotes-cancelled.component.spec.ts
+    |       |       quotes-cancelled.component.ts
+    |       |       
+    |       \---quotes-rejected
+    |               quotes-rejected.component.css
+    |               quotes-rejected.component.html
+    |               quotes-rejected.component.spec.ts
+    |               quotes-rejected.component.ts
+    |               
+    +---guards
+    |       auth.guard.ts
+    |       
+    +---models
+    |       quotation.model.ts
+    |       
+    \---services
+            auth.service.ts
+            config.service.ts
+            dashboard.service.ts
+            quotation.service.ts
+            role.service.ts
+            user.service.ts
+            
