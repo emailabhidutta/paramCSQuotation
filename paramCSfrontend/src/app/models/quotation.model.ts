@@ -12,8 +12,8 @@ export interface Quotation {
   Date: Date;
   CreationDate: Date;
   QStatusID: QuotationStatus;
-  created_by?: number; // Assuming this is the user ID
-  last_modified_by?: number; // Assuming this is the user ID
+  created_by?: number;
+  last_modified_by?: number;
   total_value: number;
   rejection_reason?: string;
   details?: QuotationDetails[];

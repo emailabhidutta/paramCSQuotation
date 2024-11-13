@@ -8,6 +8,10 @@
         </span>
         <input autoComplete="username" cFormControl placeholder="Username" formControlName="username" />
       </c-input-group>
+      <div *ngIf="usernameControl?.invalid && (usernameControl?.dirty || usernameControl?.touched)" class="text-danger mb-3">
+        <small *ngIf="usernameControl?.errors?.['required']">Username is required.</small>
+        <small *ngIf="usernameControl?.errors?.['minlength']">Username must be at least 3 characters long.</small>
+      </div>
       <c-input-group class="mb-4">
         <span cInputGroupText>
           <svg cIcon name="cilLockLocked"></svg>
@@ -18,8 +22,15 @@
                type="password"
                formControlName="password" />
       </c-input-group>
+      <div *ngIf="passwordControl?.invalid && (passwordControl?.dirty || passwordControl?.touched)" class="text-danger mb-3">
+        <small *ngIf="passwordControl?.errors?.['required']">Password is required.</small>
+        <small *ngIf="passwordControl?.errors?.['minlength']">Password must be at least 6 characters long.</small>
+      </div>
       <div class="d-grid">
-        <button cButton color="primary" type="submit">Login</button>
+        <button cButton color="primary" type="submit" [disabled]="loginForm.invalid || loading">
+          <c-spinner *ngIf="loading" size="sm" class="me-2"></c-spinner>
+          Login
+        </button>
       </div>
     </form>
     <div *ngIf="error" class="alert alert-danger mt-3">{{error}}</div>
