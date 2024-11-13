@@ -1,5 +1,6 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
+from django.core.exceptions import ValidationError
 
 class Role(models.Model):
     RoleID = models.CharField(max_length=10, primary_key=True)
@@ -43,6 +44,26 @@ class CustomUser(AbstractUser):
     PhoneNumber = models.CharField(max_length=15, null=True, blank=True)
     Department = models.CharField(max_length=50, null=True, blank=True)
     UserID = models.CharField(max_length=4, unique=True, null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
+    reset_password_token = models.CharField(max_length=100, null=True, blank=True)
+    reset_password_expires = models.DateTimeField(null=True, blank=True)
+
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name='groups',
+        blank=True,
+        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
+        related_name="customuser_set",
+        related_query_name="user",
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        verbose_name='user permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_name="customuser_set",
+        related_query_name="user",
+    )
 
     def __str__(self):
         return self.get_full_name() or self.username
@@ -51,6 +72,24 @@ class CustomUser(AbstractUser):
         if self.RoleID:
             return UserRights.objects.filter(RoleID=self.RoleID)
         return UserRights.objects.none()
+
+    def has_right(self, right_name):
+        return self.get_user_rights().filter(RightsID__RightName=right_name).exists()
+
+    def has_role(self, role_name):
+        return self.RoleID and self.RoleID.RoleName == role_name
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.is_active = False
+        self.save()
+
+    def clean(self):
+        super().clean()
+        if self.EmployeeNo and not self.EmployeeNo.isalnum():
+            raise ValidationError({'EmployeeNo': 'Employee number must be alphanumeric.'})
+        if self.PhoneNumber and not self.PhoneNumber.isdigit():
+            raise ValidationError({'PhoneNumber': 'Phone number must contain only digits.'})
 
     class Meta:
         verbose_name = "User"
