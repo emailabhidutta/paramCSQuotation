@@ -1,27 +1,58 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { DashboardService } from '../../services/dashboard.service';
-import { ChartConfiguration } from 'chart.js';
+import { ChartConfiguration, ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+interface DashboardSummary {
+  totalQuotes: number;
+  acceptedQuotes: number;
+  pendingQuotes: number;
+  totalValue: number;
+}
+
+interface Quote {
+  id: string;
+  customerName: string;
+  amount: number;
+  status: string;
+  date: string;
+}
+
+interface Customer {
+  id: string;
+  name: string;
+  totalQuotes: number;
+  totalValue: number;
+}
+
+interface MonthlyQuoteData {
+  month: string;
+  count: number;
+}
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
-  dashboardData: any = {
+  dashboardData: DashboardSummary = {
     totalQuotes: 0,
     acceptedQuotes: 0,
     pendingQuotes: 0,
     totalValue: 0
   };
-  recentQuotes: any[] = [];
-  topCustomers: any[] = [];
+  recentQuotes: Quote[] = [];
+  topCustomers: Customer[] = [];
   currentYear: number = new Date().getFullYear();
   loading: boolean = true;
   error: string | null = null;
+
+  private unsubscribe$ = new Subject<void>();
 
   // Line chart configuration
   lineChartData: ChartConfiguration['data'] = {
@@ -67,26 +98,33 @@ export class DashboardComponent implements OnInit {
     this.loadDashboardData();
   }
 
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
   loadDashboardData(): void {
     this.loading = true;
     this.error = null;
-    this.dashboardService.getDashboardData().subscribe(
-      (data: any) => {
-        this.dashboardData = data.summary;
-        this.recentQuotes = data.recentQuotes;
-        this.topCustomers = data.topCustomers;
-        this.updateChartData(data.monthlyQuotes);
-        this.loading = false;
-      },
-      error => {
-        console.error('Error fetching dashboard data', error);
-        this.error = 'Failed to load dashboard data. Please try again later.';
-        this.loading = false;
-      }
-    );
+    this.dashboardService.getDashboardData()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe(
+        (data: any) => {
+          this.dashboardData = data.summary;
+          this.recentQuotes = data.recentQuotes;
+          this.topCustomers = data.topCustomers;
+          this.updateChartData(data.monthlyQuotes);
+          this.loading = false;
+        },
+        error => {
+          console.error('Error fetching dashboard data', error);
+          this.error = 'Failed to load dashboard data. Please try again later.';
+          this.loading = false;
+        }
+      );
   }
 
-  updateChartData(monthlyData: any[]): void {
+  updateChartData(monthlyData: MonthlyQuoteData[]): void {
     this.lineChartData.datasets[0].data = monthlyData.map(item => item.count);
     this.lineChartData.labels = monthlyData.map(item => item.month);
     this.chart?.update();
@@ -95,21 +133,21 @@ export class DashboardComponent implements OnInit {
   getStatusColor(status: string): string {
     switch (status.toLowerCase()) {
       case 'accepted':
-        return 'success';
+        return 'text-success';
       case 'pending':
-        return 'warning';
+        return 'text-warning';
       case 'rejected':
-        return 'danger';
+        return 'text-danger';
       default:
-        return 'primary';
+        return 'text-secondary';
     }
-  }
-
-  formatCurrency(value: number): string {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
   }
 
   refreshDashboard(): void {
     this.loadDashboardData();
+  }
+
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
   }
 }

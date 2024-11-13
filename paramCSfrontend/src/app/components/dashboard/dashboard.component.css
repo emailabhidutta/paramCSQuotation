@@ -1,0 +1,71 @@
+.dashboard-container {
+  padding: 20px;
+}
+
+.card {
+  margin-bottom: 20px;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.display-4 {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+Ensure that your app.module.ts includes the necessary imports:
+import {
+  NgModule
+}
+
+from '@angular/core';
+import {
+  BrowserModule
+}
+
+from '@angular/platform-browser';
+import {
+  HttpClientModule
+}
+
+from '@angular/common/http';
+import {
+  NgChartsModule
+}
+
+from 'ng2-charts';
+
+import {
+  AppComponent
+}
+
+from './app.component';
+import {
+  DashboardComponent
+}
+
+from './components/dashboard/dashboard.component';
+import {
+  DashboardService
+}
+
+from './services/dashboard.service';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    DashboardComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    NgChartsModule
+  ],
+  providers: [DashboardService],
+  bootstrap: [AppComponent]
+})
+export class AppModule {
+}
