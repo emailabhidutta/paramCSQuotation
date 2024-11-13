@@ -1,75 +1,91 @@
 <c-container>
+  <h1 class="mb-4">Dashboard</h1>
+
   <c-row>
-    <c-col xs>
-      <h1 cCardTitle>Dashboard</h1>
+    <c-col xs="12" sm="6" lg="3">
+      <c-widget-stat-a title="Total Quotes"
+                       [value]="dashboardData.totalQuotes.toString()"
+                       color="primary">
+        <svg cWidgetStatAIcon width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+        </svg>
+      </c-widget-stat-a>
+    </c-col>
+    <c-col xs="12" sm="6" lg="3">
+      <c-widget-stat-a title="Accepted Quotes"
+                       [value]="dashboardData.acceptedQuotes.toString()"
+                       color="success">
+        <svg cWidgetStatAIcon width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </c-widget-stat-a>
+    </c-col>
+    <c-col xs="12" sm="6" lg="3">
+      <c-widget-stat-a title="Pending Quotes"
+                       [value]="dashboardData.pendingQuotes.toString()"
+                       color="warning">
+        <svg cWidgetStatAIcon width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </c-widget-stat-a>
+    </c-col>
+    <c-col xs="12" sm="6" lg="3">
+      <c-widget-stat-a title="Total Value"
+                       [value]="formatCurrency(dashboardData.totalValue)"
+                       color="info">
+        <svg cWidgetStatAIcon width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </c-widget-stat-a>
     </c-col>
   </c-row>
 
-  <div *ngIf="loading" class="text-center">
-    <c-spinner></c-spinner>
-  </div>
+  <c-row class="mt-4">
+    <c-col xs="12" lg="6">
+      <c-card>
+        <c-card-header>Monthly Quotes ({{ currentYear }})</c-card-header>
+        <c-card-body>
+          <c-chart type="line" [data]="lineChartData" [options]="lineChartOptions"></c-chart>
+        </c-card-body>
+      </c-card>
+    </c-col>
+    <c-col xs="12" lg="6">
+      <c-card>
+        <c-card-header>Quote Distribution</c-card-header>
+        <c-card-body>
+          <c-chart type="doughnut" [data]="pieChartData" [options]="pieChartOptions"></c-chart>
+        </c-card-body>
+      </c-card>
+    </c-col>
+  </c-row>
 
-  <c-alert *ngIf="error" color="danger">
-    {{ error }}
-  </c-alert>
-
-  <ng-container *ngIf="!loading && !error">
-    <c-row>
-      <c-col sm="6" xl="3">
-        <c-widget-stat-a title="Total Quotes"
-                         value="{{ dashboardData.totalQuotes }}"
-                         color="primary">
-          <svg cWidgetStatAIcon width="24" viewBox="0 0 24 24">
-            <path d="M17 18a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2c0-1.11.89-2 2-2M1 2h3.27l.94 2H20a1 1 0 0 1 1 1c0 .17-.05.34-.12.5l-3.58 6.47c-.34.61-1 1.03-1.75 1.03H8.1l-.9 1.63l-.03.12a.25.25 0 0 0 .25.25H19v2H7a2 2 0 0 1-2-2c0-.35.09-.68.24-.96l1.36-2.45L3 4H1V2m6 16a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2c0-1.11.89-2 2-2m9-7l2.78-5H6.14l2.36 5H16Z" />
-          </svg>
-        </c-widget-stat-a>
-      </c-col>
-      <c-col sm="6" xl="3">
-        <c-widget-stat-a title="Accepted Quotes"
-                         value="{{ dashboardData.acceptedQuotes }}"
-                         color="success">
-          <svg cWidgetStatAIcon width="24" viewBox="0 0 24 24">
-            <path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 2a8 8 0 0 1 8 8a8 8 0 0 1-8 8a8 8 0 0 1-8-8a8 8 0 0 1 8-8m-5 6v2h10v-2H7Z" />
-          </svg>
-        </c-widget-stat-a>
-      </c-col>
-      <c-col sm="6" xl="3">
-        <c-widget-stat-a title="Pending Quotes"
-                         value="{{ dashboardData.pendingQuotes }}"
-                         color="warning">
-          <svg cWidgetStatAIcon width="24" viewBox="0 0 24 24">
-            <path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 2a8 8 0 0 1 8 8a8 8 0 0 1-8 8a8 8 0 0 1-8-8a8 8 0 0 1 8-8m-5 6v2h10v-2H7Z" />
-          </svg>
-        </c-widget-stat-a>
-      </c-col>
-      <c-col sm="6" xl="3">
-        <c-widget-stat-a title="Total Value"
-                         value="{{ formatCurrency(dashboardData.totalValue) }}"
-                         color="info">
-          <svg cWidgetStatAIcon width="24" viewBox="0 0 24 24">
-            <path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2Z" />
-          </svg>
-        </c-widget-stat-a>
-      </c-col>
-    </c-row>
-
-    <c-row>
-      <c-col xs="12" lg="8">
-        <c-card class="mb-4">
-          <c-card-header>Monthly Quotes ({{ currentYear }})</c-card-header>
-          <c-card-body>
-            <c-chart type="line" [data]="lineChartData" [options]="lineChartOptions"></c-chart>
-          </c-card-body>
-        </c-card>
-      </c-col>
-      <c-col xs="12" lg="4">
-        <c-card class="mb-4">
-          <c-card-header>Quote Status Distribution</c-card-header>
-          <c-card-body>
-            <c-chart type="doughnut" [data]="pieChartData" [options]="pieChartOptions"></c-chart>
-          </c-card-body>
-        </c-card>
-      </c-col>
-    </c-row>
-  </ng-container>
+  <c-row class="mt-4">
+    <c-col xs="12">
+      <c-card>
+        <c-card-header>Recent Quotes</c-card-header>
+        <c-card-body>
+          <table cTable>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let quote of recentQuotes">
+                <td>{{ quote.id }}</td>
+                <td>{{ quote.customer }}</td>
+                <td>{{ quote.date | date }}</td>
+                <td [ngClass]="getStatusColor(quote.status)">{{ quote.status }}</td>
+                <td>{{ formatCurrency(quote.value) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </c-card-body>
+      </c-card>
+    </c-col>
+  </c-row>
 </c-container>

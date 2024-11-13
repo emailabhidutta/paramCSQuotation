@@ -1,9 +1,10 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -26,13 +27,13 @@ import {
   ProgressModule,
   SharedModule,
   SidebarModule,
-  SpinnerModule,
   TabsModule,
   UtilitiesModule,
-  WidgetModule
+  WidgetModule // Added WidgetModule
 } from '@coreui/angular';
 
 import { IconModule, IconSetService } from '@coreui/icons-angular';
+import { ChartjsModule } from '@coreui/angular-chartjs';
 
 // Import components
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -46,6 +47,13 @@ import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { UsersComponent } from './components/master/users/users.component';
 import { RolesComponent } from './components/master/roles/roles.component';
+
+// Import services
+import { AuthService } from './services/auth.service';
+import { DashboardService } from './services/dashboard.service';
+
+// Import interceptors
+import { AuthInterceptor } from './auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -69,6 +77,8 @@ import { RolesComponent } from './components/master/roles/roles.component';
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
+    FormsModule,
+    RouterModule,
     AvatarModule,
     BadgeModule,
     BreadcrumbModule,
@@ -85,14 +95,21 @@ import { RolesComponent } from './components/master/roles/roles.component';
     ProgressModule,
     SharedModule,
     SidebarModule,
-    SpinnerModule,
     TabsModule,
     UtilitiesModule,
     IconModule,
-    WidgetModule,
+    ChartjsModule,
+    WidgetModule // Added WidgetModule
   ],
   providers: [
     IconSetService,
+    AuthService,
+    DashboardService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

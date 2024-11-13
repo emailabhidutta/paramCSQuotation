@@ -5,7 +5,7 @@ import { QuotationService } from '../../../services/quotation.service';
 @Component({
   selector: 'app-quote-create',
   templateUrl: './quote-create.component.html',
-  styleUrls: ['./quote-create.component.css']
+  styleUrls: ['./quote-create.component.scss']  // Changed to .scss
 })
 export class QuoteCreateComponent implements OnInit {
   quotationForm: FormGroup;
@@ -15,47 +15,48 @@ export class QuoteCreateComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private quotationService: QuotationService
-  ) { }
-
-  ngOnInit() {
+  ) {
+    // Initialize the form in the constructor
     this.quotationForm = this.fb.group({
       customerNumber: ['', Validators.required],
-      customerEmail: ['', Validators.email],
+      customerEmail: ['', [Validators.required, Validators.email]],
       customerInquiryNo: [''],
-      quoteValidFrom: [''],
-      quoteValidUntil: [''],
+      quoteValidFrom: ['', Validators.required],
+      quoteValidUntil: ['', Validators.required],
       statusId: ['', Validators.required]
     });
+  }
 
+  ngOnInit(): void {
     this.loadQuotationStatuses();
   }
 
-  loadQuotationStatuses() {
-    this.quotationService.getQuotationStatuses().subscribe(
-      (statuses) => {
+  loadQuotationStatuses(): void {
+    this.quotationService.getQuotationStatuses().subscribe({
+      next: (statuses) => {
         this.quotationStatuses = statuses;
       },
-      (error) => {
+      error: (error) => {
         console.error('Error loading quotation statuses', error);
       }
-    );
+    });
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.quotationForm.valid) {
       this.loading = true;
-      this.quotationService.createQuotation(this.quotationForm.value).subscribe(
-        (response) => {
+      this.quotationService.createQuotation(this.quotationForm.value).subscribe({
+        next: (response) => {
           console.log('Quotation created successfully', response);
           this.loading = false;
           // Add logic to navigate to the quotation list or show a success message
         },
-        (error) => {
+        error: (error) => {
           console.error('Error creating quotation', error);
           this.loading = false;
           // Add logic to show an error message
         }
-      );
+      });
     }
   }
 }

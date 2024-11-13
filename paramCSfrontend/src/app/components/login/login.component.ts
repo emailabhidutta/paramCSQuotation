@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -9,38 +9,44 @@ import { Router } from '@angular/router';
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  loginForm: FormGroup;
-  error: string = '';
+  loginForm!: FormGroup;
+  error: string | null = null;
   loading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
-  ) {
+  ) { }
+
+  ngOnInit(): void {
+    this.initForm();
+  }
+
+  initForm(): void {
     this.loginForm = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required]
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
-  ngOnInit(): void { }
+  get usernameControl() { return this.loginForm.get('username'); }
+  get passwordControl() { return this.loginForm.get('password'); }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.loginForm.valid) {
       this.loading = true;
-      const username = this.loginForm.get('username')?.value;
-      const password = this.loginForm.get('password')?.value;
-
+      this.error = null;
+      const { username, password } = this.loginForm.value;
       this.authService.login(username, password).subscribe(
-        (response) => {
+        () => {
           this.loading = false;
-          // Handle successful login (e.g., store token, navigate to dashboard)
           this.router.navigate(['/dashboard']);
         },
         (error) => {
           this.loading = false;
-          this.error = 'Invalid username or password';
+          this.error = error;
+          console.error('Login failed', error);
         }
       );
     }

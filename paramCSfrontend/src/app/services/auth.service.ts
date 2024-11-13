@@ -1,15 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8000/api/'; // Update with your Django API URL
+  private apiUrl = 'http://localhost:8000/api/';
+  private currentUserSubject: BehaviorSubject<any>;
+  public currentUser: Observable<any>;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    this.currentUserSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem('currentUser') || '{}'));
+    this.currentUser = this.currentUserSubject.asObservable();
+  }
+
+  public get currentUserValue() {
+    return this.currentUserSubject.value;
+  }
 
   login(username: string, password: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}token/`, { username, password })
@@ -17,14 +26,27 @@ export class AuthService {
         tap(response => {
           localStorage.setItem('token', response.access);
           localStorage.setItem('refresh_token', response.refresh);
+          localStorage.setItem('currentUser', JSON.stringify({ username }));
+          this.currentUserSubject.next({ username });
         }),
-        catchError(this.handleError)
+        catchError(error => {
+          console.error('Login error:', error);
+          if (error.error instanceof ErrorEvent) {
+            console.error('Client-side error:', error.error.message);
+          } else {
+            console.error('Server-side error:', error.status, error.error);
+          }
+          return throwError('Login failed. Please check your credentials and try again.');
+        })
       );
   }
+
 
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('refresh_token');
+    localStorage.removeItem('currentUser');
+    this.currentUserSubject.next(null);
   }
 
   isLoggedIn(): boolean {
@@ -46,7 +68,6 @@ export class AuthService {
       );
   }
 
-  // Add these new methods
   getUsers(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}users/`).pipe(catchError(this.handleError));
   }
@@ -63,7 +84,7 @@ export class AuthService {
     return this.http.delete<any>(`${this.apiUrl}users/${userId}/`).pipe(catchError(this.handleError));
   }
 
-  handleError(error: HttpErrorResponse) {
+  private handleError(error: HttpErrorResponse) {
     let errorMessage = 'An error occurred';
     if (error.error instanceof ErrorEvent) {
       errorMessage = `Error: ${error.error.message}`;
