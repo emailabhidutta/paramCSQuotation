@@ -63,6 +63,42 @@
       <div class="col-md-4">
         <div class="card">
           <div class="card-body">
+            <h5 class="card-title">Quote Status Distribution</h5>
+            <canvas baseChart
+                    [data]="pieChartData"
+                    [options]="pieChartOptions"
+                    [type]="'pie'">
+            </canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Date Range Filter</h5>
+            <div class="row">
+              <div class="col-md-5">
+                <input type="date" class="form-control" [(ngModel)]="startDate" (change)="onDateRangeChange()">
+              </div>
+              <div class="col-md-5">
+                <input type="date" class="form-control" [(ngModel)]="endDate" (change)="onDateRangeChange()">
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-primary" (click)="onDateRangeChange()">Apply</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row mb-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
             <h5 class="card-title">Top Customers</h5>
             <ul class="list-group">
               <li *ngFor="let customer of topCustomers" class="list-group-item d-flex justify-content-between align-items-center">
@@ -98,6 +134,16 @@
                 </tr>
               </tbody>
             </table>
+            <nav aria-label="Quote pagination">
+              <ul class="pagination justify-content-center">
+                <li class="page-item" [class.disabled]="currentPage === 1">
+                  <a class="page-link" href="#" (click)="onPageChange(currentPage - 1)">Previous</a>
+                </li>
+                <li class="page-item" [class.disabled]="currentPage * pageSize >= totalQuotes">
+                  <a class="page-link" href="#" (click)="onPageChange(currentPage + 1)">Next</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>

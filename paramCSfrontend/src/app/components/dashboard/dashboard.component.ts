@@ -54,6 +54,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private unsubscribe$ = new Subject<void>();
 
+  // Pagination
+  currentPage: number = 1;
+  pageSize: number = 10;
+  totalQuotes: number = 0;
+
+  // Date range filter
+  startDate: string = '';
+  endDate: string = '';
+
   // Line chart configuration
   lineChartData: ChartConfiguration['data'] = {
     datasets: [
@@ -92,6 +101,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   };
 
+  // Pie chart for quote status distribution
+  pieChartData: ChartData<'pie', number[], string | string[]> = {
+    labels: ['Accepted', 'Pending', 'Rejected'],
+    datasets: [{
+      data: []
+    }]
+  };
+
+  pieChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+      }
+    }
+  };
+
   constructor(private dashboardService: DashboardService) { }
 
   ngOnInit(): void {
@@ -106,7 +133,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   loadDashboardData(): void {
     this.loading = true;
     this.error = null;
-    this.dashboardService.getDashboardData()
+    this.dashboardService.getDashboardData(this.startDate, this.endDate, this.currentPage, this.pageSize)
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe(
         (data: any) => {
@@ -114,6 +141,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.recentQuotes = data.recentQuotes;
           this.topCustomers = data.topCustomers;
           this.updateChartData(data.monthlyQuotes);
+          this.updatePieChartData();
+          this.totalQuotes = data.totalQuotes;
           this.loading = false;
         },
         error => {
@@ -130,6 +159,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.chart?.update();
   }
 
+  updatePieChartData(): void {
+    this.pieChartData.datasets[0].data = [
+      this.dashboardData.acceptedQuotes,
+      this.dashboardData.pendingQuotes,
+      this.dashboardData.totalQuotes - (this.dashboardData.acceptedQuotes + this.dashboardData.pendingQuotes)
+    ];
+  }
+
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadDashboardData();
+  }
+
+  onDateRangeChange(): void {
+    this.loadDashboardData();
+  }
+
+  refreshDashboard(): void {
+    this.loadDashboardData();
+  }
+
   getStatusColor(status: string): string {
     switch (status.toLowerCase()) {
       case 'accepted':
@@ -141,10 +191,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       default:
         return 'text-secondary';
     }
-  }
-
-  refreshDashboard(): void {
-    this.loadDashboardData();
   }
 
   formatCurrency(value: number): string {
