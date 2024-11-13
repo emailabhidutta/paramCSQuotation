@@ -1,154 +1,75 @@
-<div class="dashboard-container">
-  <h1>Dashboard</h1>
+<c-container>
+  <c-row>
+    <c-col xs>
+      <h1 cCardTitle>Dashboard</h1>
+    </c-col>
+  </c-row>
 
   <div *ngIf="loading" class="text-center">
-    <div class="spinner-border" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
+    <c-spinner></c-spinner>
   </div>
 
-  <div *ngIf="error" class="alert alert-danger" role="alert">
+  <c-alert *ngIf="error" color="danger">
     {{ error }}
-  </div>
+  </c-alert>
 
-  <div *ngIf="!loading && !error">
-    <div class="row mb-4">
-      <div class="col-md-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Total Quotes</h5>
-            <p class="card-text display-4">{{ dashboardData.totalQuotes }}</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Accepted Quotes</h5>
-            <p class="card-text display-4">{{ dashboardData.acceptedQuotes }}</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Pending Quotes</h5>
-            <p class="card-text display-4">{{ dashboardData.pendingQuotes }}</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Total Value</h5>
-            <p class="card-text display-4">{{ formatCurrency(dashboardData.totalValue) }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
+  <ng-container *ngIf="!loading && !error">
+    <c-row>
+      <c-col sm="6" xl="3">
+        <c-widget-stat-a title="Total Quotes"
+                         value="{{ dashboardData.totalQuotes }}"
+                         color="primary">
+          <svg cWidgetStatAIcon width="24" viewBox="0 0 24 24">
+            <path d="M17 18a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2c0-1.11.89-2 2-2M1 2h3.27l.94 2H20a1 1 0 0 1 1 1c0 .17-.05.34-.12.5l-3.58 6.47c-.34.61-1 1.03-1.75 1.03H8.1l-.9 1.63l-.03.12a.25.25 0 0 0 .25.25H19v2H7a2 2 0 0 1-2-2c0-.35.09-.68.24-.96l1.36-2.45L3 4H1V2m6 16a2 2 0 0 1 2 2a2 2 0 0 1-2 2a2 2 0 0 1-2-2c0-1.11.89-2 2-2m9-7l2.78-5H6.14l2.36 5H16Z" />
+          </svg>
+        </c-widget-stat-a>
+      </c-col>
+      <c-col sm="6" xl="3">
+        <c-widget-stat-a title="Accepted Quotes"
+                         value="{{ dashboardData.acceptedQuotes }}"
+                         color="success">
+          <svg cWidgetStatAIcon width="24" viewBox="0 0 24 24">
+            <path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 2a8 8 0 0 1 8 8a8 8 0 0 1-8 8a8 8 0 0 1-8-8a8 8 0 0 1 8-8m-5 6v2h10v-2H7Z" />
+          </svg>
+        </c-widget-stat-a>
+      </c-col>
+      <c-col sm="6" xl="3">
+        <c-widget-stat-a title="Pending Quotes"
+                         value="{{ dashboardData.pendingQuotes }}"
+                         color="warning">
+          <svg cWidgetStatAIcon width="24" viewBox="0 0 24 24">
+            <path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2m0 2a8 8 0 0 1 8 8a8 8 0 0 1-8 8a8 8 0 0 1-8-8a8 8 0 0 1 8-8m-5 6v2h10v-2H7Z" />
+          </svg>
+        </c-widget-stat-a>
+      </c-col>
+      <c-col sm="6" xl="3">
+        <c-widget-stat-a title="Total Value"
+                         value="{{ formatCurrency(dashboardData.totalValue) }}"
+                         color="info">
+          <svg cWidgetStatAIcon width="24" viewBox="0 0 24 24">
+            <path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10a10 10 0 0 0 10-10A10 10 0 0 0 12 2Z" />
+          </svg>
+        </c-widget-stat-a>
+      </c-col>
+    </c-row>
 
-    <div class="row mb-4">
-      <div class="col-md-8">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Monthly Quotes ({{ currentYear }})</h5>
-            <canvas baseChart
-                    [data]="lineChartData"
-                    [options]="lineChartOptions"
-                    [type]="'line'">
-            </canvas>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Quote Status Distribution</h5>
-            <canvas baseChart
-                    [data]="pieChartData"
-                    [options]="pieChartOptions"
-                    [type]="'pie'">
-            </canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row mb-4">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Date Range Filter</h5>
-            <div class="row">
-              <div class="col-md-5">
-                <input type="date" class="form-control" [(ngModel)]="startDate" (change)="onDateRangeChange()">
-              </div>
-              <div class="col-md-5">
-                <input type="date" class="form-control" [(ngModel)]="endDate" (change)="onDateRangeChange()">
-              </div>
-              <div class="col-md-2">
-                <button class="btn btn-primary" (click)="onDateRangeChange()">Apply</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row mb-4">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Top Customers</h5>
-            <ul class="list-group">
-              <li *ngFor="let customer of topCustomers" class="list-group-item d-flex justify-content-between align-items-center">
-                {{ customer.name }}
-                <span class="badge bg-primary rounded-pill">{{ formatCurrency(customer.totalValue) }}</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Recent Quotes</h5>
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>Customer</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let quote of recentQuotes">
-                  <td>{{ quote.customerName }}</td>
-                  <td>{{ formatCurrency(quote.amount) }}</td>
-                  <td><span [class]="getStatusColor(quote.status)">{{ quote.status }}</span></td>
-                  <td>{{ quote.date | date:'short' }}</td>
-                </tr>
-              </tbody>
-            </table>
-            <nav aria-label="Quote pagination">
-              <ul class="pagination justify-content-center">
-                <li class="page-item" [class.disabled]="currentPage === 1">
-                  <a class="page-link" href="#" (click)="onPageChange(currentPage - 1)">Previous</a>
-                </li>
-                <li class="page-item" [class.disabled]="currentPage * pageSize >= totalQuotes">
-                  <a class="page-link" href="#" (click)="onPageChange(currentPage + 1)">Next</a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <button class="btn btn-primary mt-3" (click)="refreshDashboard()">Refresh Dashboard</button>
-</div>
+    <c-row>
+      <c-col xs="12" lg="8">
+        <c-card class="mb-4">
+          <c-card-header>Monthly Quotes ({{ currentYear }})</c-card-header>
+          <c-card-body>
+            <c-chart type="line" [data]="lineChartData" [options]="lineChartOptions"></c-chart>
+          </c-card-body>
+        </c-card>
+      </c-col>
+      <c-col xs="12" lg="4">
+        <c-card class="mb-4">
+          <c-card-header>Quote Status Distribution</c-card-header>
+          <c-card-body>
+            <c-chart type="doughnut" [data]="pieChartData" [options]="pieChartOptions"></c-chart>
+          </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
+  </ng-container>
+</c-container>

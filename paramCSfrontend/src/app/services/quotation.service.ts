@@ -64,4 +64,9 @@ export class QuotationService {
   deleteQuotation(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}quotations/${id}/`);
   }
+
+  // New method to get quotation statuses
+  getQuotationStatuses(): Observable<QuotationStatus[]> {
+    return this.http.get<QuotationStatus[]>(`${this.apiUrl}quotation-statuses/`);
+  }
 }

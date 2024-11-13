@@ -1,38 +1,47 @@
-<c-card>
-  <c-card-header>Login</c-card-header>
-  <c-card-body>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <c-input-group class="mb-3">
-        <span cInputGroupText>
-          <svg cIcon name="cilUser"></svg>
-        </span>
-        <input autoComplete="username" cFormControl placeholder="Username" formControlName="username" />
-      </c-input-group>
-      <div *ngIf="usernameControl?.invalid && (usernameControl?.dirty || usernameControl?.touched)" class="text-danger mb-3">
-        <small *ngIf="usernameControl?.errors?.['required']">Username is required.</small>
-        <small *ngIf="usernameControl?.errors?.['minlength']">Username must be at least 3 characters long.</small>
-      </div>
-      <c-input-group class="mb-4">
-        <span cInputGroupText>
-          <svg cIcon name="cilLockLocked"></svg>
-        </span>
-        <input autoComplete="current-password"
-               cFormControl
-               placeholder="Password"
-               type="password"
-               formControlName="password" />
-      </c-input-group>
-      <div *ngIf="passwordControl?.invalid && (passwordControl?.dirty || passwordControl?.touched)" class="text-danger mb-3">
-        <small *ngIf="passwordControl?.errors?.['required']">Password is required.</small>
-        <small *ngIf="passwordControl?.errors?.['minlength']">Password must be at least 6 characters long.</small>
-      </div>
-      <div class="d-grid">
-        <button cButton color="primary" type="submit" [disabled]="loginForm.invalid || loading">
-          <c-spinner *ngIf="loading" size="sm" class="me-2"></c-spinner>
-          Login
-        </button>
-      </div>
-    </form>
-    <div *ngIf="error" class="alert alert-danger mt-3">{{error}}</div>
-  </c-card-body>
-</c-card>
+<div class="bg-light min-vh-100 d-flex flex-row align-items-center">
+  <c-container>
+    <c-row class="justify-content-center">
+      <c-col md="8" lg="6" xl="5">
+        <c-card class="p-4">
+          <c-card-body>
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+              <h1>Login</h1>
+              <p class="text-medium-emphasis">Sign In to your account</p>
+              <c-input-group class="mb-3">
+                <span cInputGroupText>
+                  <svg cIcon name="cilUser"></svg>
+                </span>
+                <input autoComplete="username" cFormControl placeholder="Username" formControlName="username" />
+              </c-input-group>
+              <div *ngIf="usernameControl?.invalid && (usernameControl?.dirty || usernameControl?.touched)" class="text-danger mb-3">
+                <small *ngIf="usernameControl?.errors?.['required']">Username is required.</small>
+                <small *ngIf="usernameControl?.errors?.['minlength']">Username must be at least 3 characters long.</small>
+              </div>
+              <c-input-group class="mb-4">
+                <span cInputGroupText>
+                  <svg cIcon name="cilLockLocked"></svg>
+                </span>
+                <input autoComplete="current-password"
+                       cFormControl
+                       placeholder="Password"
+                       type="password"
+                       formControlName="password" />
+              </c-input-group>
+              <div *ngIf="passwordControl?.invalid && (passwordControl?.dirty || passwordControl?.touched)" class="text-danger mb-3">
+                <small *ngIf="passwordControl?.errors?.['required']">Password is required.</small>
+                <small *ngIf="passwordControl?.errors?.['minlength']">Password must be at least 6 characters long.</small>
+              </div>
+              <div class="d-grid">
+                <button cButton color="primary" class="px-4" type="submit" [disabled]="loginForm.invalid || loading">
+                  <c-spinner *ngIf="loading" size="sm" class="me-2"></c-spinner>
+                  Login
+                </button>
+              </div>
+            </form>
+            <c-alert *ngIf="error" color="danger" class="mt-3">{{error}}</c-alert>
+          </c-card-body>
+        </c-card>
+      </c-col>
+    </c-row>
+  </c-container>
+</div>

@@ -1,18 +1,17 @@
-LoginComponent(login.component.ts):
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   loginForm: FormGroup;
-  loading = false;
-  error = '';
+  error: string = '';
+  loading: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -25,17 +24,23 @@ export class LoginComponent {
     });
   }
 
-  onSubmit(): void {
+  ngOnInit(): void { }
+
+  onSubmit() {
     if (this.loginForm.valid) {
       this.loading = true;
-      this.authService.login(this.loginForm.value).subscribe(
-        () => {
+      const username = this.loginForm.get('username')?.value;
+      const password = this.loginForm.get('password')?.value;
+
+      this.authService.login(username, password).subscribe(
+        (response) => {
+          this.loading = false;
+          // Handle successful login (e.g., store token, navigate to dashboard)
           this.router.navigate(['/dashboard']);
         },
         (error) => {
-          this.error = 'Invalid username or password';
           this.loading = false;
-          console.error('Login error:', error);
+          this.error = 'Invalid username or password';
         }
       );
     }

@@ -1,1 +1,64 @@
-<p>quote-create works!</p>
+<c-card>
+  <c-card-header>
+    <strong>Create New Quotation</strong>
+  </c-card-header>
+  <c-card-body>
+    <form [formGroup]="quotationForm" (ngSubmit)="onSubmit()">
+      <c-row class="mb-3">
+        <c-col md="6">
+          <label cLabel for="customerNumber">Customer Number</label>
+          <input cFormControl id="customerNumber" formControlName="customerNumber" placeholder="Enter customer number">
+          <c-form-feedback *ngIf="quotationForm.get('customerNumber')?.invalid && (quotationForm.get('customerNumber')?.dirty || quotationForm.get('customerNumber')?.touched)">
+            <div *ngIf="quotationForm.get('customerNumber')?.errors?.['required']">Customer number is required.</div>
+          </c-form-feedback>
+        </c-col>
+        <c-col md="6">
+          <label cLabel for="customerEmail">Customer Email</label>
+          <input cFormControl id="customerEmail" formControlName="customerEmail" type="email" placeholder="Enter customer email">
+          <c-form-feedback *ngIf="quotationForm.get('customerEmail')?.invalid && (quotationForm.get('customerEmail')?.dirty || quotationForm.get('customerEmail')?.touched)">
+            <div *ngIf="quotationForm.get('customerEmail')?.errors?.['email']">Please enter a valid email address.</div>
+          </c-form-feedback>
+        </c-col>
+      </c-row>
+
+      <c-row class="mb-3">
+        <c-col md="6">
+          <label cLabel for="customerInquiryNo">Customer Inquiry No</label>
+          <input cFormControl id="customerInquiryNo" formControlName="customerInquiryNo" placeholder="Enter customer inquiry number">
+        </c-col>
+        <c-col md="6">
+          <label cLabel for="quoteValidFrom">Quote Valid From</label>
+          <input cFormControl id="quoteValidFrom" formControlName="quoteValidFrom" type="date">
+        </c-col>
+      </c-row>
+
+      <c-row class="mb-3">
+        <c-col md="6">
+          <label cLabel for="quoteValidUntil">Quote Valid Until</label>
+          <input cFormControl id="quoteValidUntil" formControlName="quoteValidUntil" type="date">
+        </c-col>
+        <c-col md="6">
+          <label cLabel for="statusId">Status</label>
+          <select cSelect id="statusId" formControlName="statusId">
+            <option value="">Select status</option>
+            <option *ngFor="let status of quotationStatuses" [value]="status.QStatusID">{{ status.QStatusName }}</option>
+          </select>
+          <c-form-feedback *ngIf="quotationForm.get('statusId')?.invalid && (quotationForm.get('statusId')?.dirty || quotationForm.get('statusId')?.touched)">
+            <div *ngIf="quotationForm.get('statusId')?.errors?.['required']">Status is required.</div>
+          </c-form-feedback>
+        </c-col>
+      </c-row>
+
+      <!-- You might want to add more fields here for quotation details and item details -->
+
+      <c-row>
+        <c-col xs="12">
+          <button cButton color="primary" type="submit" [disabled]="quotationForm.invalid || loading">
+            <c-spinner *ngIf="loading" size="sm" class="me-2"></c-spinner>
+            Create Quotation
+          </button>
+        </c-col>
+      </c-row>
+    </form>
+  </c-card-body>
+</c-card>

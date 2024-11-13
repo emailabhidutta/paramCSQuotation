@@ -1,71 +1,70 @@
+
 .dashboard-container {
   padding: 20px;
 }
 
+h1 {
+  color: #333;
+  margin-bottom: 30px;
+}
+
 .card {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: 0.3s;
+  border-radius: 5px;
   margin-bottom: 20px;
+}
+
+  .card:hover {
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+
+.card-body {
+  padding: 20px;
 }
 
 .card-title {
   font-size: 1.2rem;
   font-weight: bold;
+  margin-bottom: 10px;
+  color: #495057;
 }
 
-.display-4 {
+.card-text.display-4 {
   font-size: 2.5rem;
   font-weight: bold;
+  color: #007bff;
 }
 
-Ensure that your app.module.ts includes the necessary imports:
-import {
-  NgModule
+.alert {
+  margin-bottom: 20px;
 }
 
-from '@angular/core';
-import {
-  BrowserModule
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
 }
 
-from '@angular/platform-browser';
-import {
-  HttpClientModule
+canvas {
+  max-width: 100%;
 }
 
-from '@angular/common/http';
-import {
-  NgChartsModule
+.form-control {
+  margin-bottom: 10px;
 }
 
-from 'ng2-charts';
-
-import {
-  AppComponent
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
 }
 
-from './app.component';
-import {
-  DashboardComponent
-}
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
 
-from './components/dashboard/dashboard.component';
-import {
-  DashboardService
-}
-
-from './services/dashboard.service';
-
-@NgModule({
-  declarations: [
-    AppComponent,
-    DashboardComponent
-  ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    NgChartsModule
-  ],
-  providers: [DashboardService],
-  bootstrap: [AppComponent]
-})
-export class AppModule {
+@media (max-width: 768px) {
+  .col-md-3 {
+    margin-bottom: 20px;
+  }
 }

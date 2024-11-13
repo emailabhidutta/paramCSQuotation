@@ -7,7 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
-// Import CoreUI Modules
+// Import CoreUI modules
 import {
   AvatarModule,
   BadgeModule,
@@ -26,53 +26,55 @@ import {
   SharedModule,
   SidebarModule,
   TabsModule,
-  UtilitiesModule
+  UtilitiesModule,
+  WidgetModule
 } from '@coreui/angular';
 
 import { IconModule, IconSetService } from '@coreui/icons-angular';
-import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 
-// Import ng2-charts
-import { NgChartsModule } from 'ng2-charts';
+// Import PerfectScrollbar
+//import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+//import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
+//import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
+
+//const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
+//  suppressScrollX: true
+//};
 
 // Import components
-import { HeaderComponent } from './components/header/header.component';
-import { FooterComponent } from './components/footer/footer.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { LoginComponent } from './components/login/login.component';
-import { UsersComponent } from './components/master/users/users.component';
-import { RolesComponent } from './components/master/roles/roles.component';
 import { QuoteCreateComponent } from './components/quotes/quote-create/quote-create.component';
 import { QuotesAllComponent } from './components/quotes/quotes-all/quotes-all.component';
 import { QuotesAcceptedComponent } from './components/quotes/quotes-accepted/quotes-accepted.component';
 import { QuotesRejectedComponent } from './components/quotes/quotes-rejected/quotes-rejected.component';
 import { QuotesCancelledComponent } from './components/quotes/quotes-cancelled/quotes-cancelled.component';
-import { QuotationDetailComponent } from './components/quotes/quotation-detail/quotation-detail.component';
-import { QuotationListComponent } from './components/quotes/quotation-list/quotation-list.component';
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { UsersComponent } from './components/master/users/users.component';
+import { RolesComponent } from './components/master/roles/roles.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HeaderComponent,
-    FooterComponent,
     DashboardComponent,
     LoginComponent,
-    UsersComponent,
-    RolesComponent,
     QuoteCreateComponent,
     QuotesAllComponent,
     QuotesAcceptedComponent,
     QuotesRejectedComponent,
     QuotesCancelledComponent,
-    QuotationDetailComponent,
-    QuotationListComponent
+    HeaderComponent,
+    FooterComponent,
+    UsersComponent,
+    RolesComponent
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
-    ReactiveFormsModule,
     HttpClientModule,
+    ReactiveFormsModule,
     AvatarModule,
     BadgeModule,
     BreadcrumbModule,
@@ -92,10 +94,16 @@ import { QuotationListComponent } from './components/quotes/quotation-list/quota
     TabsModule,
     UtilitiesModule,
     IconModule,
-    PerfectScrollbarModule,
-    NgChartsModule  // Add this line
+    WidgetModule,
+  //  PerfectScrollbarModule
   ],
-  providers: [IconSetService],
+  providers: [
+    IconSetService,
+    {
+      provide: PERFECT_SCROLLBAR_CONFIG,
+      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
