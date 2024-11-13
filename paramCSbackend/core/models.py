@@ -3,7 +3,7 @@ from django.db import models
 from django.core.exceptions import ValidationError
 
 class Role(models.Model):
-    RoleID = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, related_name='users', db_column='RoleID')
+    RoleID = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, related_name='child_roles', db_column='RoleID')
     RoleName = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
@@ -43,7 +43,7 @@ class UserRights(models.Model):
 class CustomUser(AbstractUser):
     EmployeeNo = models.CharField(max_length=10, null=True, blank=True)
     IsActive = models.BooleanField(default=True)
-    RoleID = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, related_name='users')
+    RoleID = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, related_name='role_users', db_column='RoleID')
     PhoneNumber = models.CharField(max_length=15, null=True, blank=True)
     Department = models.CharField(max_length=50, null=True, blank=True)
     UserID = models.CharField(max_length=4, unique=True, null=True, blank=True)
