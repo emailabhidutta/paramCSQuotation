@@ -1,8 +1,9 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -25,21 +26,13 @@ import {
   ProgressModule,
   SharedModule,
   SidebarModule,
+  SpinnerModule,
   TabsModule,
   UtilitiesModule,
   WidgetModule
 } from '@coreui/angular';
 
 import { IconModule, IconSetService } from '@coreui/icons-angular';
-
-// Import PerfectScrollbar
-//import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
-//import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
-//import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
-
-//const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
-//  suppressScrollX: true
-//};
 
 // Import components
 import { DashboardComponent } from './components/dashboard/dashboard.component';
@@ -72,6 +65,7 @@ import { RolesComponent } from './components/master/roles/roles.component';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    CommonModule,
     AppRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
@@ -91,19 +85,16 @@ import { RolesComponent } from './components/master/roles/roles.component';
     ProgressModule,
     SharedModule,
     SidebarModule,
+    SpinnerModule,
     TabsModule,
     UtilitiesModule,
     IconModule,
     WidgetModule,
-  //  PerfectScrollbarModule
   ],
   providers: [
     IconSetService,
-    {
-      provide: PERFECT_SCROLLBAR_CONFIG,
-      useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG
-    }
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppModule { }

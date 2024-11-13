@@ -16,11 +16,11 @@
   }"
                    routerLink="/">
   </c-sidebar-brand>
-  <perfect-scrollbar [config]="perfectScrollbarConfig">
+  <div class="scrollbar-container">
     <c-sidebar-nav [navItems]="navItems"
                    dropdownMode="close">
     </c-sidebar-nav>
-  </perfect-scrollbar>
+  </div>
   <c-sidebar-toggler *ngIf="!sidebar.narrow"
                      toggle="unfoldable"
                      cSidebarToggle="sidebar"></c-sidebar-toggler>
