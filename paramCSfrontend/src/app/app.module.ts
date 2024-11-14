@@ -64,6 +64,7 @@ import { DashboardService } from './services/dashboard.service';
 
 // Import interceptors
 import { AuthInterceptor } from './auth.interceptor';
+import { QuoteLineItemsComponent } from './components/quote-line-items/quote-line-items.component';
 
 @NgModule({
   declarations: [
@@ -78,7 +79,8 @@ import { AuthInterceptor } from './auth.interceptor';
     HeaderComponent,
     FooterComponent,
     UsersComponent,
-    RolesComponent
+    RolesComponent,
+    QuoteLineItemsComponent
   ],
   imports: [
     BrowserModule,

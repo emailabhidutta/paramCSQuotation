@@ -11,6 +11,7 @@ import { navItems } from './nav';
 export class AppComponent implements OnInit {
   public navItems = navItems;
   public isLoginPage = false;
+  title = 'paramCSQuotation'; // Add this line to resolve the test error
 
   constructor(private router: Router) { }
 

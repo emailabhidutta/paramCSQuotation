@@ -6,50 +6,145 @@
     <form [formGroup]="quotationForm" (ngSubmit)="onSubmit()">
       <c-row class="mb-3">
         <c-col md="6">
-          <label cLabel for="customerNumber">Customer Number</label>
-          <input cFormControl id="customerNumber" formControlName="customerNumber" placeholder="Enter customer number">
-          <c-form-feedback *ngIf="quotationForm.get('customerNumber')?.invalid && (quotationForm.get('customerNumber')?.dirty || quotationForm.get('customerNumber')?.touched)">
-            <div *ngIf="quotationForm.get('customerNumber')?.errors?.['required']">Customer number is required.</div>
-          </c-form-feedback>
+          <label cLabel for="sapQuotationNo">SAP Quotation No.</label>
+          <input cFormControl id="sapQuotationNo" formControlName="sapQuotationNo" placeholder="Enter SAP Quotation No.">
         </c-col>
         <c-col md="6">
-          <label cLabel for="customerEmail">Customer Email</label>
-          <input cFormControl id="customerEmail" formControlName="customerEmail" type="email" placeholder="Enter customer email">
-          <c-form-feedback *ngIf="quotationForm.get('customerEmail')?.invalid && (quotationForm.get('customerEmail')?.dirty || quotationForm.get('customerEmail')?.touched)">
-            <div *ngIf="quotationForm.get('customerEmail')?.errors?.['email']">Please enter a valid email address.</div>
-          </c-form-feedback>
+          <label cLabel for="revNo">Rev No.</label>
+          <input cFormControl id="revNo" formControlName="revNo" placeholder="Enter Rev No.">
         </c-col>
       </c-row>
 
       <c-row class="mb-3">
         <c-col md="6">
-          <label cLabel for="customerInquiryNo">Customer Inquiry No</label>
-          <input cFormControl id="customerInquiryNo" formControlName="customerInquiryNo" placeholder="Enter customer inquiry number">
+          <label cLabel for="creationDate">Creation Date</label>
+          <input cFormControl id="creationDate" formControlName="creationDate" type="date" readonly>
         </c-col>
         <c-col md="6">
-          <label cLabel for="quoteValidFrom">Quote Valid From</label>
-          <input cFormControl id="quoteValidFrom" formControlName="quoteValidFrom" type="date">
+          <label cLabel for="customerInquiryNo">Customer Inquiry No.</label>
+          <input cFormControl id="customerInquiryNo" formControlName="customerInquiryNo" placeholder="Enter Customer Inquiry No.">
         </c-col>
       </c-row>
 
       <c-row class="mb-3">
         <c-col md="6">
-          <label cLabel for="quoteValidUntil">Quote Valid Until</label>
-          <input cFormControl id="quoteValidUntil" formControlName="quoteValidUntil" type="date">
+          <label cLabel for="customer">Customer</label>
+          <input cFormControl id="customer" formControlName="customer" placeholder="Enter or search customer">
         </c-col>
         <c-col md="6">
-          <label cLabel for="statusId">Status</label>
-          <select cSelect id="statusId" formControlName="statusId">
-            <option value="">Select status</option>
-            <option *ngFor="let status of quotationStatuses" [value]="status.QStatusID">{{ status.QStatusName }}</option>
+          <label cLabel for="customerName1">Customer Name 1</label>
+          <input cFormControl id="customerName1" formControlName="customerName1" readonly>
+        </c-col>
+      </c-row>
+
+      <c-row class="mb-3">
+        <c-col md="6">
+          <label cLabel for="customerName2">Customer Name 2</label>
+          <input cFormControl id="customerName2" formControlName="customerName2" readonly>
+        </c-col>
+        <c-col md="6">
+          <label cLabel for="customerAddress">House & Street Name</label>
+          <input cFormControl id="customerAddress" formControlName="customerAddress" readonly>
+        </c-col>
+      </c-row>
+
+      <c-row class="mb-3">
+        <c-col md="6">
+          <label cLabel for="custPriceProc">Cust Price Proc</label>
+          <input cFormControl id="custPriceProc" formControlName="custPriceProc" readonly>
+        </c-col>
+        <c-col md="6">
+          <label cLabel for="paymentTerm">Payment Term</label>
+          <input cFormControl id="paymentTerm" formControlName="paymentTerm">
+        </c-col>
+      </c-row>
+
+      <c-row class="mb-3">
+        <c-col md="6">
+          <label cLabel for="tradingCurrency">Trading Currency</label>
+          <input cFormControl id="tradingCurrency" formControlName="tradingCurrency">
+        </c-col>
+        <c-col md="6">
+          <label cLabel for="incoterm">Incoterm</label>
+          <input cFormControl id="incoterm" formControlName="incoterm">
+        </c-col>
+      </c-row>
+
+      <c-row class="mb-3">
+        <c-col md="6">
+          <label cLabel for="incotermPort">Incoterm (Port)</label>
+          <input cFormControl id="incotermPort" formControlName="incotermPort">
+        </c-col>
+        <c-col md="6">
+          <label cLabel for="deliveryDate">Delivery Date</label>
+          <input cFormControl id="deliveryDate" formControlName="deliveryDate" type="date">
+        </c-col>
+      </c-row>
+
+      <c-row class="mb-3">
+        <c-col md="6">
+          <label cLabel for="validFromDate">Valid From Date</label>
+          <input cFormControl id="validFromDate" formControlName="validFromDate" type="date">
+        </c-col>
+        <c-col md="6">
+          <label cLabel for="validToDate">Valid To Date</label>
+          <input cFormControl id="validToDate" formControlName="validToDate" type="date">
+        </c-col>
+      </c-row>
+
+      <c-row class="mb-3">
+        <c-col md="12">
+          <label cLabel for="headerText">Header Text</label>
+          <textarea cFormControl id="headerText" formControlName="headerText" rows="3"></textarea>
+        </c-col>
+      </c-row>
+
+      <c-row class="mb-3">
+        <c-col md="6">
+          <label cLabel for="materialDetailsPrint">Material Details to be Printed</label>
+          <select cSelect id="materialDetailsPrint" formControlName="materialDetailsPrint">
+            <option value="full">Full Material Description</option>
+            <option value="4digit">4 digit Description (Text)</option>
+            <option value="basic">Basic Material (Text)</option>
+            <option value="drawing">Drawing #</option>
           </select>
-          <c-form-feedback *ngIf="quotationForm.get('statusId')?.invalid && (quotationForm.get('statusId')?.dirty || quotationForm.get('statusId')?.touched)">
-            <div *ngIf="quotationForm.get('statusId')?.errors?.['required']">Status is required.</div>
-          </c-form-feedback>
+        </c-col>
+        <c-col md="6">
+          <label cLabel for="salesPerson">Sales Person</label>
+          <input cFormControl id="salesPerson" formControlName="salesPerson">
         </c-col>
       </c-row>
 
-      <!-- You might want to add more fields here for quotation details and item details -->
+      <c-row class="mb-3">
+        <c-col md="6">
+          <label cLabel for="salesPersonEmail">Email</label>
+          <input cFormControl id="salesPersonEmail" formControlName="salesPersonEmail" type="email">
+        </c-col>
+        <c-col md="6">
+          <label cLabel for="salesPersonPhone">Phone number</label>
+          <input cFormControl id="salesPersonPhone" formControlName="salesPersonPhone">
+        </c-col>
+      </c-row>
+
+      <h4>Quotation Items</h4>
+      <app-quote-line-items [parentForm]="quotationForm"></app-quote-line-items>
+
+      <c-row class="mb-3">
+        <c-col md="6">
+          <strong>Header Total Discount:</strong>
+          <input cFormControl formControlName="headerTotalDiscount" type="number">
+        </c-col>
+        <c-col md="6">
+          <strong>Total Sales Value:</strong> {{ totalSalesValue | currency }}
+        </c-col>
+      </c-row>
+
+      <c-row class="mb-3">
+        <c-col md="6">
+          <strong>GST / VAT Value:</strong>
+          <input cFormControl formControlName="gstVatValue" type="number">
+        </c-col>
+      </c-row>
 
       <c-row>
         <c-col xs="12">
