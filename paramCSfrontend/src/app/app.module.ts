@@ -29,7 +29,7 @@ import {
   SidebarModule,
   TabsModule,
   UtilitiesModule,
-  WidgetModule // Added WidgetModule
+  WidgetModule
 } from '@coreui/angular';
 
 import { IconModule, IconSetService } from '@coreui/icons-angular';
@@ -99,7 +99,7 @@ import { AuthInterceptor } from './auth.interceptor';
     UtilitiesModule,
     IconModule,
     ChartjsModule,
-    WidgetModule // Added WidgetModule
+    WidgetModule
   ],
   providers: [
     IconSetService,
