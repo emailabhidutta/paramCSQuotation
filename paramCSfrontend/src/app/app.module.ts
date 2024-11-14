@@ -33,6 +33,16 @@ import {
 } from '@coreui/angular';
 
 import { IconModule, IconSetService } from '@coreui/icons-angular';
+import { IconSetModule } from '@coreui/icons-angular';
+import {
+  cilMenu,
+  cilBell,
+  cilSettings,
+  cilGlobeAlt,
+  cilUser,
+  cilAccountLogout
+} from '@coreui/icons';
+
 import { ChartjsModule } from '@coreui/angular-chartjs';
 
 // Import components
@@ -98,6 +108,7 @@ import { AuthInterceptor } from './auth.interceptor';
     TabsModule,
     UtilitiesModule,
     IconModule,
+    IconSetModule,
     ChartjsModule,
     WidgetModule
   ],
@@ -114,4 +125,15 @@ import { AuthInterceptor } from './auth.interceptor';
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class AppModule { }
+export class AppModule {
+  constructor(private iconSetService: IconSetService) {
+    iconSetService.icons = {
+      cilMenu,
+      cilBell,
+      cilSettings,
+      cilGlobeAlt,
+      cilUser,
+      cilAccountLogout
+    };
+  }
+}
