@@ -1,16 +1,20 @@
 from django.urls import path, include
-from django.contrib import admin
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import home, dashboard_view  # Import the dashboard view
+from rest_framework.routers import DefaultRouter
+from .views import (
+    dashboard_view,
+    QuotationStatusViewSet,
+    QuotationViewSet,
+    QuotationDetailsViewSet,
+    QuotationItemDetailsViewSet
+)
+
+router = DefaultRouter()
+router.register(r'status', QuotationStatusViewSet)
+router.register(r'quotations', QuotationViewSet)
+router.register(r'details', QuotationDetailsViewSet)
+router.register(r'items', QuotationItemDetailsViewSet)
 
 urlpatterns = [
-    path('', home, name='home'),
-    path('admin/', admin.site.urls),
-    path('api/core/', include('core.urls')),
-    path('api/quotation/', include('quotation.urls')),
-    path('api/company/', include('company.urls')),
-    path('api/finance/', include('finance.urls')),
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/dashboard/', dashboard_view, name='dashboard'),  # Add this line
+    path('', include(router.urls)),
+    path('dashboard/', dashboard_view, name='dashboard'),
 ]

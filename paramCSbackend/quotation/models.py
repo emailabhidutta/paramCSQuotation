@@ -39,7 +39,7 @@ class Quotation(models.Model):
     class Meta:
         verbose_name = "Quotation"
         verbose_name_plural = "Quotations"
-        ordering = ['-Date', 'QuotationNo']
+        ordering = ['-CreationDate', 'QuotationNo']
 
     def clean(self):
         if self.Date > timezone.now().date():

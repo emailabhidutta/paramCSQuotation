@@ -40,9 +40,9 @@ export class LoginComponent implements OnInit {
           this.loading = false;
           this.router.navigate(['/dashboard']);
         },
-        (error) => {
+        (error: Error) => {
           this.loading = false;
-          this.error = 'Invalid username or password';
+          this.error = error.message;
           console.error('Login failed', error);
         }
       );

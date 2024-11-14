@@ -43,7 +43,7 @@ export class UsersComponent implements OnInit {
         this.users = users;
         this.errorMessage = '';
       },
-      error => {
+      (error: Error) => {
         console.error('Error fetching users', error);
         this.errorMessage = 'Failed to load users. Please try again.';
       }
@@ -65,14 +65,14 @@ export class UsersComponent implements OnInit {
 
   createUser() {
     this.authService.createUser(this.userForm.value).subscribe(
-      response => {
+      (response: User) => {
         console.log('User created successfully', response);
         this.successMessage = 'User created successfully!';
         this.errorMessage = '';
         this.userForm.reset();
         this.loadUsers();
       },
-      error => {
+      (error: Error) => {
         console.error('Error creating user', error);
         this.errorMessage = 'Failed to create user. Please try again.';
         this.successMessage = '';
@@ -84,7 +84,7 @@ export class UsersComponent implements OnInit {
     if (this.editingUser) {
       const updatedUser = { ...this.editingUser, ...this.userForm.value };
       this.authService.updateUser(updatedUser).subscribe(
-        response => {
+        (response: User) => {
           console.log('User updated successfully', response);
           this.successMessage = 'User updated successfully!';
           this.errorMessage = '';
@@ -92,7 +92,7 @@ export class UsersComponent implements OnInit {
           this.editingUser = null;
           this.loadUsers();
         },
-        error => {
+        (error: Error) => {
           console.error('Error updating user', error);
           this.errorMessage = 'Failed to update user. Please try again.';
           this.successMessage = '';
@@ -128,7 +128,7 @@ export class UsersComponent implements OnInit {
           this.errorMessage = '';
           this.loadUsers();
         },
-        error => {
+        (error: Error) => {
           console.error('Error deleting user', error);
           this.errorMessage = 'Failed to delete user. Please try again.';
           this.successMessage = '';
