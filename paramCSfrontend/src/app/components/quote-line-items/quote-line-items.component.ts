@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 
 @Component({
@@ -8,6 +8,7 @@ import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 })
 export class QuoteLineItemsComponent implements OnInit {
   @Input() parentForm!: FormGroup;
+  @Output() lineItemsChanged = new EventEmitter<void>();
 
   constructor(private fb: FormBuilder) { }
 
@@ -39,10 +40,12 @@ export class QuoteLineItemsComponent implements OnInit {
     });
 
     this.lineItems.push(lineItem);
+    this.lineItemsChanged.emit();
   }
 
   removeLineItem(index: number) {
     this.lineItems.removeAt(index);
+    this.lineItemsChanged.emit();
   }
 
   calculateOrderValue(index: number) {
@@ -54,5 +57,6 @@ export class QuoteLineItemsComponent implements OnInit {
 
     const orderValue = (perPrice - discount + surcharge) * quantity;
     item.patchValue({ orderValue: orderValue });
+    this.lineItemsChanged.emit();
   }
 }

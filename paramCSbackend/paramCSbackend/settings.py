@@ -145,13 +145,17 @@ REST_FRAMEWORK = {
     ],
 }
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:4200",  # Your Angular app's URL
+]
+
 # JWT settings
+from datetime import timedelta
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
-
-CORS_ALLOW_ALL_ORIGINS = True  # Only for development, configure properly for production
 
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, 'paramCSfrontend', 'dist', 'paramCSfrontend')

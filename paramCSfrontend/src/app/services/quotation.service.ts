@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_URL } from '../app.module';
 
 export interface QuotationStatus {
   QStatusID: string;
@@ -33,40 +34,40 @@ export interface DashboardData {
   providedIn: 'root'
 })
 export class QuotationService {
-  private apiUrl = 'http://localhost:8000/api/'; // Update with your Django API URL
-
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    @Inject(API_URL) private apiUrl: string
+  ) { }
 
   getDashboardData(): Observable<DashboardData> {
     return this.http.get<DashboardData>(`${this.apiUrl}dashboard/`);
   }
 
   getQuotations(): Observable<Quotation[]> {
-    return this.http.get<Quotation[]>(`${this.apiUrl}quotations/`);
+    return this.http.get<Quotation[]>(`${this.apiUrl}quotation/quotations/`);
   }
 
   getQuotationById(id: string): Observable<Quotation> {
-    return this.http.get<Quotation>(`${this.apiUrl}quotations/${id}/`);
+    return this.http.get<Quotation>(`${this.apiUrl}quotation/quotations/${id}/`);
   }
 
   getQuotationsByStatus(status: string): Observable<Quotation[]> {
-    return this.http.get<Quotation[]>(`${this.apiUrl}quotations/?status=${status}`);
+    return this.http.get<Quotation[]>(`${this.apiUrl}quotation/quotations/?status=${status}`);
   }
 
-  createQuotation(quotationData: Partial<Quotation>): Observable<Quotation> {
-    return this.http.post<Quotation>(`${this.apiUrl}quotations/`, quotationData);
+  createQuotation(quotationData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}quotation/quotations/`, quotationData);
   }
 
   updateQuotation(id: string, quotationData: Partial<Quotation>): Observable<Quotation> {
-    return this.http.put<Quotation>(`${this.apiUrl}quotations/${id}/`, quotationData);
+    return this.http.put<Quotation>(`${this.apiUrl}quotation/quotations/${id}/`, quotationData);
   }
 
   deleteQuotation(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}quotations/${id}/`);
+    return this.http.delete(`${this.apiUrl}quotation/quotations/${id}/`);
   }
 
-  // New method to get quotation statuses
   getQuotationStatuses(): Observable<QuotationStatus[]> {
-    return this.http.get<QuotationStatus[]>(`${this.apiUrl}quotation-statuses/`);
+    return this.http.get<QuotationStatus[]>(`${this.apiUrl}quotation/statuses/`);
   }
 }

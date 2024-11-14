@@ -1,13 +1,15 @@
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, InjectionToken } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { environment } from '../environments/environment';
+
+export const API_URL = new InjectionToken<string>('apiUrl');
 
 // Import CoreUI modules
 import {
@@ -118,6 +120,7 @@ import { QuoteLineItemsComponent } from './components/quote-line-items/quote-lin
     IconSetService,
     AuthService,
     DashboardService,
+    { provide: API_URL, useValue: environment.apiUrl },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,

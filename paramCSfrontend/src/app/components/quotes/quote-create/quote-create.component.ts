@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
-import { QuotationService } from '../../../services/quotation.service'; // Update this path as needed
+import { QuotationService } from '../../../services/quotation.service';
 
 @Component({
   selector: 'app-quote-create',
@@ -17,7 +17,7 @@ export class QuoteCreateComponent implements OnInit {
     private fb: FormBuilder,
     private quotationService: QuotationService
   ) {
-    this.quotationForm = this.fb.group({}); // Initialize here
+    this.quotationForm = this.fb.group({});
   }
 
   ngOnInit(): void {
@@ -52,8 +52,6 @@ export class QuoteCreateComponent implements OnInit {
       headerTotalDiscount: [0],
       gstVatValue: [0]
     });
-
-    this.addLineItem(); // Add an initial line item
   }
 
   getDefaultValidToDate(): string {
@@ -63,79 +61,47 @@ export class QuoteCreateComponent implements OnInit {
   }
 
   loadQuotationStatuses(): void {
-    // TODO: Load quotation statuses from API
-    this.quotationStatuses = [
-      { QStatusID: '1', QStatusName: 'Draft' },
-      { QStatusID: '2', QStatusName: 'Submitted' },
-      { QStatusID: '3', QStatusName: 'Approved' },
-      { QStatusID: '4', QStatusName: 'Rejected' }
-    ];
+    this.quotationService.getQuotationStatuses().subscribe(
+      (statuses) => {
+        this.quotationStatuses = statuses;
+      },
+      (error) => {
+        console.error('Error loading quotation statuses', error);
+      }
+    );
   }
 
-  get lineItems() {
+  get lineItems(): FormArray {
     return this.quotationForm.get('lineItems') as FormArray;
   }
 
-  addLineItem() {
-    const lineItem = this.createLineItem();
-    this.lineItems.push(lineItem);
-  }
-
-  createLineItem(): FormGroup {
-    return this.fb.group({
-      item: [''],
-      materialNo: [''],
-      materialDescription: [''],
-      perPrice: [0],
-      per: [1],
-      uom: [''],
-      discountValue: [0],
-      surchargeValue: [0],
-      orderQuantity: [0],
-      orderValue: [0],
-      itemText: [''],
-      usage: [''],
-      projectId: ['']
-    });
-  }
-
-  removeLineItem(index: number) {
-    this.lineItems.removeAt(index);
+  onLineItemsChanged(): void {
     this.calculateTotalSalesValue();
   }
 
-  calculateOrderValue(index: number) {
-    const item = this.lineItems.at(index);
-    const perPrice = item.get('perPrice')?.value ?? 0;
-    const quantity = item.get('orderQuantity')?.value ?? 0;
-    const discount = item.get('discountValue')?.value ?? 0;
-    const surcharge = item.get('surchargeValue')?.value ?? 0;
-
-    const orderValue = (perPrice - discount + surcharge) * quantity;
-    item.patchValue({ orderValue: orderValue });
-
-    this.calculateTotalSalesValue();
-  }
-
-  calculateTotalSalesValue() {
-    this.totalSalesValue = this.lineItems.controls.reduce((total, item) => {
-      return total + (item.get('orderValue')?.value ?? 0);
-    }, 0);
+  calculateTotalSalesValue(): void {
+    let total = 0;
+    for (let item of this.lineItems.controls) {
+      total += item.get('orderValue')?.value ?? 0;
+    }
+    total -= this.quotationForm.get('headerTotalDiscount')?.value ?? 0;
+    total += this.quotationForm.get('gstVatValue')?.value ?? 0;
+    this.totalSalesValue = total;
   }
 
   onSubmit(): void {
     if (this.quotationForm.valid) {
       this.loading = true;
       this.quotationService.createQuotation(this.quotationForm.value).subscribe(
-        (response: any) => {
+        (response) => {
           console.log('Quotation created successfully', response);
           this.loading = false;
-          // Handle success (e.g., show success message, navigate to quotation list)
+          // TODO: Navigate to quotation list or show success message
         },
-        (error: any) => {
+        (error) => {
           console.error('Error creating quotation', error);
           this.loading = false;
-          // Handle error (e.g., show error message)
+          // TODO: Show error message to user
         }
       );
     }

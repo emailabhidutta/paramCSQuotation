@@ -99,58 +99,31 @@
         </c-col>
       </c-row>
 
+      <app-quote-line-items [parentForm]="quotationForm" (lineItemsChanged)="onLineItemsChanged()">
+      </app-quote-line-items>
+
       <c-row class="mb-3">
         <c-col md="6">
-          <label cLabel for="materialDetailsPrint">Material Details to be Printed</label>
-          <select cSelect id="materialDetailsPrint" formControlName="materialDetailsPrint">
-            <option value="full">Full Material Description</option>
-            <option value="4digit">4 digit Description (Text)</option>
-            <option value="basic">Basic Material (Text)</option>
-            <option value="drawing">Drawing #</option>
-          </select>
+          <label cLabel for="headerTotalDiscount">Header Total Discount</label>
+          <input cFormControl id="headerTotalDiscount" formControlName="headerTotalDiscount" type="number" (input)="calculateTotalSalesValue()">
         </c-col>
         <c-col md="6">
-          <label cLabel for="salesPerson">Sales Person</label>
-          <input cFormControl id="salesPerson" formControlName="salesPerson">
+          <label cLabel for="gstVatValue">GST/VAT Value</label>
+          <input cFormControl id="gstVatValue" formControlName="gstVatValue" type="number" (input)="calculateTotalSalesValue()">
         </c-col>
       </c-row>
 
       <c-row class="mb-3">
-        <c-col md="6">
-          <label cLabel for="salesPersonEmail">Email</label>
-          <input cFormControl id="salesPersonEmail" formControlName="salesPersonEmail" type="email">
-        </c-col>
-        <c-col md="6">
-          <label cLabel for="salesPersonPhone">Phone number</label>
-          <input cFormControl id="salesPersonPhone" formControlName="salesPersonPhone">
-        </c-col>
-      </c-row>
-
-      <h4>Quotation Items</h4>
-      <app-quote-line-items [parentForm]="quotationForm"></app-quote-line-items>
-
-      <c-row class="mb-3">
-        <c-col md="6">
-          <strong>Header Total Discount:</strong>
-          <input cFormControl formControlName="headerTotalDiscount" type="number">
-        </c-col>
-        <c-col md="6">
-          <strong>Total Sales Value:</strong> {{ totalSalesValue | currency }}
-        </c-col>
-      </c-row>
-
-      <c-row class="mb-3">
-        <c-col md="6">
-          <strong>GST / VAT Value:</strong>
-          <input cFormControl formControlName="gstVatValue" type="number">
+        <c-col md="12">
+          <label cLabel for="totalSalesValue">Total Sales Value</label>
+          <input cFormControl id="totalSalesValue" [value]="totalSalesValue" readonly>
         </c-col>
       </c-row>
 
       <c-row>
-        <c-col xs="12">
+        <c-col md="12">
           <button cButton color="primary" type="submit" [disabled]="quotationForm.invalid || loading">
-            <c-spinner *ngIf="loading" size="sm" class="me-2"></c-spinner>
-            Create Quotation
+            {{ loading ? 'Saving...' : 'Save Quotation' }}
           </button>
         </c-col>
       </c-row>
