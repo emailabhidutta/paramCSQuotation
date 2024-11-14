@@ -30,9 +30,6 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  get usernameControl() { return this.loginForm.get('username'); }
-  get passwordControl() { return this.loginForm.get('password'); }
-
   onSubmit(): void {
     if (this.loginForm.valid) {
       this.loading = true;
@@ -45,7 +42,7 @@ export class LoginComponent implements OnInit {
         },
         (error) => {
           this.loading = false;
-          this.error = error;
+          this.error = 'Invalid username or password';
           console.error('Login failed', error);
         }
       );

@@ -13,17 +13,23 @@ import { QuotationDetailComponent } from './components/quotes/quotation-detail/q
 import { AuthGuard } from './guards/auth.guard';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
-  { path: 'quotes/create', component: QuoteCreateComponent, canActivate: [AuthGuard] },
-  { path: 'quotes/all', component: QuotesAllComponent, canActivate: [AuthGuard] },
-  { path: 'quotes/accepted', component: QuotesAcceptedComponent, canActivate: [AuthGuard] },
-  { path: 'quotes/rejected', component: QuotesRejectedComponent, canActivate: [AuthGuard] },
-  { path: 'quotes/cancelled', component: QuotesCancelledComponent, canActivate: [AuthGuard] },
-  { path: 'quotes/:id', component: QuotationDetailComponent, canActivate: [AuthGuard] },
-  { path: 'master/users', component: UsersComponent, canActivate: [AuthGuard] },
-  { path: 'master/roles', component: RolesComponent, canActivate: [AuthGuard] },
+  {
+    path: '',
+    canActivate: [AuthGuard],
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'quotes/create', component: QuoteCreateComponent },
+      { path: 'quotes/all', component: QuotesAllComponent },
+      { path: 'quotes/accepted', component: QuotesAcceptedComponent },
+      { path: 'quotes/rejected', component: QuotesRejectedComponent },
+      { path: 'quotes/cancelled', component: QuotesCancelledComponent },
+      { path: 'quotes/:id', component: QuotationDetailComponent },
+      { path: 'master/users', component: UsersComponent },
+      { path: 'master/roles', component: RolesComponent },
+    ]
+  },
 ];
 
 @NgModule({

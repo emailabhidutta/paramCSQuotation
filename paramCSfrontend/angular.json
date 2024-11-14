@@ -7,7 +7,8 @@
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
-          "standalone": false
+          "standalone": false,
+          "style": "scss"
         },
         "@schematics/angular:directive": {
           "standalone": false
@@ -33,7 +34,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "src/assets",
+                "output": "/assets/"
               },
               {
                 "glob": "favicon.ico",
@@ -48,7 +50,8 @@
             ],
             "styles": [
               "node_modules/@coreui/coreui/scss/coreui.scss",
-              "src/styles.css"
+              "node_modules/@coreui/icons/css/all.min.css",
+              "src/styles.scss"
             ],
             "scripts": []
           },
@@ -57,13 +60,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kB",
-                  "maximumError": "4kB"
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
                 }
               ],
               "outputHashing": "all"
@@ -89,7 +92,10 @@
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n"
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "buildTarget": "paramCSfrontend:build"
+          }
         },
         "test": {
           "builder": "@angular-devkit/build-angular:karma",
@@ -102,7 +108,8 @@
             "assets": [
               {
                 "glob": "**/*",
-                "input": "public"
+                "input": "src/assets",
+                "output": "/assets/"
               },
               {
                 "glob": "favicon.ico",
@@ -114,10 +121,6 @@
                 "input": "node_modules/@coreui/icons/sprites",
                 "output": "assets/icons/sprites"
               }
-            ],
-            "styles": [
-              "node_modules/@coreui/coreui/scss/coreui.scss",
-              "src/styles.css"
             ],
             "scripts": [],
             "karmaConfig": "karma.conf.js"
