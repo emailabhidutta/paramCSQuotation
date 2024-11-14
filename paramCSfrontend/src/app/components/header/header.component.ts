@@ -1,7 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -9,16 +8,11 @@ import { AuthService } from '../../services/auth.service';
   styleUrls: ['./header.component.scss']
 })
 export class HeaderComponent implements OnInit {
-  @Input() sidebarId: string = "sidebar";
-
   currentPageTitle: string = 'Dashboard';
   notificationCount: number = 1800;
   userName: string = 'KSB Admin';
 
-  constructor(
-    private router: Router,
-    private authService: AuthService
-  ) { }
+  constructor(private router: Router) { }
 
   ngOnInit() {
     this.router.events.pipe(
@@ -41,26 +35,26 @@ export class HeaderComponent implements OnInit {
   }
 
   toggleSidebar() {
-    const sidebar = document.querySelector('#' + this.sidebarId);
-    if (sidebar) {
-      sidebar.classList.toggle('hide');
-    }
+    document.body.classList.toggle('sidebar-show');
   }
 
   toggleNotifications() {
     console.log('Toggle notifications');
+    // Implement notification toggle functionality
   }
 
   openSettings() {
     console.log('Open settings');
+    // Implement settings functionality
   }
 
   changeLanguage() {
     console.log('Change language');
+    // Implement language change functionality
   }
 
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+  toggleUserMenu() {
+    console.log('Toggle user menu');
+    // Implement user menu toggle functionality
   }
 }

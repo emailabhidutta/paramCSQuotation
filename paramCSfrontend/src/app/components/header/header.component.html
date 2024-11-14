@@ -1,52 +1,24 @@
-<c-header class="header header-sticky" position="sticky" [sidebarId]="sidebarId">
-  <c-container [fluid]="true">
-    <c-header-toggler (click)="toggleSidebar()" class="ps-1">
-      <svg cIcon name="cilMenu" size="lg"></svg>
-    </c-header-toggler>
-    <c-header-brand class="d-none d-md-flex me-auto">{{ currentPageTitle }}</c-header-brand>
-    <c-header-nav class="d-none d-md-flex">
-      <!-- Add any additional nav items here if needed -->
-    </c-header-nav>
-    <c-header-nav class="ms-3">
-      <c-nav-item>
-        <button cButton color="light" variant="ghost" (click)="toggleNotifications()">
-          <svg cIcon name="cilBell" size="lg"></svg>
-          <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
-        </button>
-      </c-nav-item>
-      <c-nav-item>
-        <button cButton color="light" variant="ghost" (click)="openSettings()">
-          <svg cIcon name="cilSettings" size="lg"></svg>
-        </button>
-      </c-nav-item>
-      <c-nav-item>
-        <button cButton color="light" variant="ghost" (click)="changeLanguage()">
-          <svg cIcon name="cilGlobeAlt" size="lg"></svg>
-        </button>
-      </c-nav-item>
-      <c-nav-item>
-        <c-dropdown alignment="end">
-          <a cDropdownToggle class="py-0 user-dropdown-toggle">
-            <c-avatar src="assets/img/avatars/8.jpg" size="md"></c-avatar>
-          </a>
-          <ul cDropdownMenu class="pt-0 pr-5 w-auto">
-            <li>
-              <h6 cDropdownHeader class="bg-light fw-semibold py-2">{{ userName }}</h6>
-            </li>
-            <li><hr cDropdownDivider></li>
-            <li>
-              <a routerLink="/profile" cDropdownItem>
-                <svg cIcon name="cilUser" class="me-2"></svg> Profile
-              </a>
-            </li>
-            <li>
-              <a (click)="logout()" cDropdownItem>
-                <svg cIcon name="cilAccountLogout" class="me-2"></svg> Logout
-              </a>
-            </li>
-          </ul>
-        </c-dropdown>
-      </c-nav-item>
-    </c-header-nav>
-  </c-container>
+<c-header class="header">
+  <div class="header-left">
+    <div class="header-toggle" (click)="toggleSidebar()">
+      <svg cIcon name="cilMenu"></svg>
+    </div>
+    <div class="header-title">{{ currentPageTitle }}</div>
+  </div>
+  <div class="header-right">
+    <div class="header-action notification-icon" (click)="toggleNotifications()">
+      <svg cIcon name="cilBell"></svg>
+      <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+    </div>
+    <div class="header-action" (click)="openSettings()">
+      <svg cIcon name="cilSettings"></svg>
+    </div>
+    <div class="header-action" (click)="changeLanguage()">
+      <svg cIcon name="cilGlobeAlt"></svg>
+    </div>
+    <div class="header-user" (click)="toggleUserMenu()">
+      <c-avatar src="assets/img/avatars/8.jpg" size="sm"></c-avatar>
+      <span class="user-name">{{ userName }}</span>
+    </div>
+  </div>
 </c-header>
