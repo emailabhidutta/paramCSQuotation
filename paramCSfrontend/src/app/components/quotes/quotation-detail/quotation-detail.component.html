@@ -1,1 +1,63 @@
-<p>quotation-detail works!</p>
+<div *ngIf="loading">Loading...</div>
+
+<div *ngIf="error" class="error-message">
+  {{ error }}
+</div>
+
+<div *ngIf="quotation && !loading && !error">
+  <h2>Quotation Details: {{quotation.QuotationNo}}</h2>
+  <p>Customer: {{quotation.CustomerNumber}}</p>
+  <p>Status: {{quotation.QStatusID.QStatusName}}</p>
+  <p>Total Value: {{calculateTotalValue() | currency}}</p>
+  <p>Valid From: {{quotation.QuoteValidFrom | date}}</p>
+  <p>Valid Until: {{quotation.QuoteValidUntil | date}}</p>
+  <p>Customer Email: {{quotation.CustomerEmail}}</p>
+  <p>Remarks: {{quotation.Remarks}}</p>
+  <p>GST/VAT Value: {{quotation.GSTVATValue | currency}}</p>
+  <p>Total Discount: {{quotation.TotalDiscount | currency}}</p>
+
+  <button (click)="approveQuotation()" [disabled]="quotation.QStatusID.QStatusName === 'Approved'">Approve</button>
+  <button (click)="rejectQuotation()" [disabled]="quotation.QStatusID.QStatusName === 'Rejected'">Reject</button>
+  <input [(ngModel)]="rejectionReason" placeholder="Rejection reason">
+  <button (click)="reviseQuotation()" [disabled]="quotation.QStatusID.QStatusName === 'Draft'">Revise</button>
+
+  <div *ngFor="let detail of quotationDetails">
+    <h3>Quotation Detail: {{detail.QuoteRevisionNo}}</h3>
+    <p>Sales Organization: {{detail.SalesOrganization}}</p>
+    <p>Customer Inquiry No: {{detail.CustomerInquiryNo}}</p>
+    <p>Sold To Customer Number: {{detail.SoldToCustomerNumber}}</p>
+    <p>Ship To Customer Number: {{detail.ShipToCustomerNumber}}</p>
+    <p>Trading Currency: {{detail.TradingCurrency}}</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Material Number</th>
+          <th>Description</th>
+          <th>Price Per</th>
+          <th>Per</th>
+          <th>UoM</th>
+          <th>Quantity</th>
+          <th>Discount</th>
+          <th>Surcharge</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of detail.items">
+          <td>{{item.MaterialNumber}}</td>
+          <td>{{item.MaterialDescription}}</td>
+          <td>{{item.PricePer | currency}}</td>
+          <td>{{item.Per}}</td>
+          <td>{{item.UnitOfMeasure}}</td>
+          <td>{{item.OrderQuantity}}</td>
+          <td>{{item.DiscountValue | currency}}</td>
+          <td>{{item.SurchargeValue | currency}}</td>
+          <td>{{item.OrderValue | currency}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<button routerLink="/quotations">Back to Quotations</button>

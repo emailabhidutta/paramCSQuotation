@@ -1,1 +1,57 @@
-<p>quotation-list works!</p>
+<h2>Quotations</h2>
+
+<div *ngIf="loading">Loading quotations...</div>
+
+<div *ngIf="error" class="error-message">
+  {{ error }}
+</div>
+
+<div *ngIf="!loading && !error">
+  <div class="filter-section">
+    <label for="statusFilter">Filter by Status:</label>
+    <select id="statusFilter" [(ngModel)]="selectedStatus" (change)="onStatusChange()">
+      <option [ngValue]="null">All Statuses</option>
+      <option *ngFor="let status of quotationStatuses" [value]="status.QStatusID">
+        {{status.QStatusName}}
+      </option>
+    </select>
+  </div>
+
+  <table *ngIf="quotations.length > 0">
+    <thead>
+      <tr>
+        <th>Quotation No.</th>
+        <th>Customer</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Total Value</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let quotation of quotations">
+        <td>{{ quotation.QuotationNo }}</td>
+        <td>{{ quotation.CustomerNumber }}</td>
+        <td>{{ quotation.Date | date }}</td>
+        <td>{{ quotation.QStatusID.QStatusName }}</td>
+        <td>{{ quotation.total_value | currency }}</td>
+        <td>
+          <a [routerLink]="['/quotations', quotation.QuoteId]">View</a>
+          <button (click)="deleteQuotation(quotation.QuoteId)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="quotations.length === 0">
+    No quotations found.
+  </div>
+
+  <div class="pagination">
+    <button (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 1">Previous</button>
+    <span>Page {{ currentPage }} of {{ Math.ceil(totalQuotations / pageSize) }}</span>
+    <button (click)="onPageChange(currentPage + 1)" [disabled]="currentPage === Math.ceil(totalQuotations / pageSize)">Next</button>
+  </div>
+</div>
+
+<button routerLink="/quotations/create">Create New Quotation</button>

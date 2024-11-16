@@ -1,132 +1,153 @@
-<c-card>
-  <c-card-header>
-    <strong>Create New Quotation</strong>
-  </c-card-header>
-  <c-card-body>
-    <form [formGroup]="quotationForm" (ngSubmit)="onSubmit()">
-      <c-row class="mb-3">
-        <c-col md="6">
-          <label cLabel for="sapQuotationNo">SAP Quotation No.</label>
-          <input cFormControl id="sapQuotationNo" formControlName="sapQuotationNo" placeholder="Enter SAP Quotation No.">
-        </c-col>
-        <c-col md="6">
-          <label cLabel for="revNo">Rev No.</label>
-          <input cFormControl id="revNo" formControlName="revNo" placeholder="Enter Rev No.">
-        </c-col>
-      </c-row>
+<form [formGroup]="quotationForm" (ngSubmit)="onSubmit()">
+  <h2>Create New Quotation</h2>
 
-      <c-row class="mb-3">
-        <c-col md="6">
-          <label cLabel for="creationDate">Creation Date</label>
-          <input cFormControl id="creationDate" formControlName="creationDate" type="date" readonly>
-        </c-col>
-        <c-col md="6">
-          <label cLabel for="customerInquiryNo">Customer Inquiry No.</label>
-          <input cFormControl id="customerInquiryNo" formControlName="customerInquiryNo" placeholder="Enter Customer Inquiry No.">
-        </c-col>
-      </c-row>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="QuotationNo">SAP Quotation No.</label>
+      <input id="QuotationNo" formControlName="QuotationNo" readonly>
+    </div>
+    <div class="form-group">
+      <label for="LastRevision">Rev No.</label>
+      <input id="LastRevision" formControlName="LastRevision" readonly>
+    </div>
+    <div class="form-group">
+      <label for="CreationDate">Creation Date</label>
+      <input id="CreationDate" formControlName="CreationDate" type="date" readonly>
+    </div>
+    <div class="form-group">
+      <label for="CustomerInquiryNo">Customer Inquiry No.</label>
+      <input id="CustomerInquiryNo" formControlName="CustomerInquiryNo">
+    </div>
+  </div>
 
-      <c-row class="mb-3">
-        <c-col md="6">
-          <label cLabel for="customer">Customer</label>
-          <input cFormControl id="customer" formControlName="customer" placeholder="Enter or search customer">
-        </c-col>
-        <c-col md="6">
-          <label cLabel for="customerName1">Customer Name 1</label>
-          <input cFormControl id="customerName1" formControlName="customerName1" readonly>
-        </c-col>
-      </c-row>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="CustomerNumber">Customer</label>
+      <input id="CustomerNumber" formControlName="CustomerNumber" [ngbTypeahead]="searchCustomer" (selectItem)="onCustomerSelect($event.item)" required>
+    </div>
+    <div class="form-group">
+      <label for="Date">Date</label>
+      <input id="Date" formControlName="Date" type="date" required>
+    </div>
+    <div class="form-group">
+      <label for="QStatusID">Status</label>
+      <select id="QStatusID" formControlName="QStatusID" required>
+        <option *ngFor="let status of quotationStatuses" [value]="status.QStatusID">
+          {{status.QStatusName}}
+        </option>
+      </select>
+    </div>
+  </div>
 
-      <c-row class="mb-3">
-        <c-col md="6">
-          <label cLabel for="customerName2">Customer Name 2</label>
-          <input cFormControl id="customerName2" formControlName="customerName2" readonly>
-        </c-col>
-        <c-col md="6">
-          <label cLabel for="customerAddress">House & Street Name</label>
-          <input cFormControl id="customerAddress" formControlName="customerAddress" readonly>
-        </c-col>
-      </c-row>
+  <div class="form-row">
+    <div class="form-group">
+      <label for="QuoteValidFrom">Valid From</label>
+      <input id="QuoteValidFrom" formControlName="QuoteValidFrom" type="date">
+    </div>
+    <div class="form-group">
+      <label for="QuoteValidUntil">Valid Until</label>
+      <input id="QuoteValidUntil" formControlName="QuoteValidUntil" type="date">
+    </div>
+    <div class="form-group">
+      <label for="CustomerEmail">Customer Email</label>
+      <input id="CustomerEmail" formControlName="CustomerEmail" type="email">
+    </div>
+  </div>
 
-      <c-row class="mb-3">
-        <c-col md="6">
-          <label cLabel for="custPriceProc">Cust Price Proc</label>
-          <input cFormControl id="custPriceProc" formControlName="custPriceProc" readonly>
-        </c-col>
-        <c-col md="6">
-          <label cLabel for="paymentTerm">Payment Term</label>
-          <input cFormControl id="paymentTerm" formControlName="paymentTerm">
-        </c-col>
-      </c-row>
+  <div class="form-group">
+    <label for="Remarks">Remarks</label>
+    <textarea id="Remarks" formControlName="Remarks"></textarea>
+  </div>
 
-      <c-row class="mb-3">
-        <c-col md="6">
-          <label cLabel for="tradingCurrency">Trading Currency</label>
-          <input cFormControl id="tradingCurrency" formControlName="tradingCurrency">
-        </c-col>
-        <c-col md="6">
-          <label cLabel for="incoterm">Incoterm</label>
-          <input cFormControl id="incoterm" formControlName="incoterm">
-        </c-col>
-      </c-row>
+  <div formArrayName="details">
+    <div *ngFor="let detail of details.controls; let i = index" [formGroupName]="i">
+      <h3>Quotation Detail {{i + 1}}</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="SalesOrganization-{{i}}">Sales Organization</label>
+          <select id="SalesOrganization-{{i}}" formControlName="SalesOrganization" required>
+            <option *ngFor="let org of salesOrganizations" [value]="org.SalesOrganizationID">
+              {{org.SalesOrganizationName}}
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="TradingCurrency-{{i}}">Trading Currency</label>
+          <select id="TradingCurrency-{{i}}" formControlName="TradingCurrency" required>
+            <option *ngFor="let currency of currencies" [value]="currency.CurrencyID">
+              {{currency.CurrencyName}}
+            </option>
+          </select>
+        </div>
+      </div>
 
-      <c-row class="mb-3">
-        <c-col md="6">
-          <label cLabel for="incotermPort">Incoterm (Port)</label>
-          <input cFormControl id="incotermPort" formControlName="incotermPort">
-        </c-col>
-        <c-col md="6">
-          <label cLabel for="deliveryDate">Delivery Date</label>
-          <input cFormControl id="deliveryDate" formControlName="deliveryDate" type="date">
-        </c-col>
-      </c-row>
+      <div formArrayName="items">
+        <div *ngFor="let item of getItems(i).controls; let j = index" [formGroupName]="j">
+          <h4>Item {{j + 1}}</h4>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="MaterialNumber-{{i}}-{{j}}">Material Number</label>
+              <input id="MaterialNumber-{{i}}-{{j}}" formControlName="MaterialNumber" [ngbTypeahead]="searchMaterial" (selectItem)="onMaterialSelect($event.item, i, j)" required>
+            </div>
+            <div class="form-group">
+              <label for="MaterialDescription-{{i}}-{{j}}">Material Description</label>
+              <input id="MaterialDescription-{{i}}-{{j}}" formControlName="MaterialDescription" required>
+            </div>
+            <div class="form-group">
+              <label for="PricePer-{{i}}-{{j}}">Price Per</label>
+              <input id="PricePer-{{i}}-{{j}}" formControlName="PricePer" type="number" (change)="calculateOrderValue(i, j)" required>
+            </div>
+            <div class="form-group">
+              <label for="Per-{{i}}-{{j}}">Per</label>
+              <input id="Per-{{i}}-{{j}}" formControlName="Per" type="number" required>
+            </div>
+            <div class="form-group">
+              <label for="UnitOfMeasure-{{i}}-{{j}}">Unit of Measure</label>
+              <input id="UnitOfMeasure-{{i}}-{{j}}" formControlName="UnitOfMeasure" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="OrderQuantity-{{i}}-{{j}}">Order Quantity</label>
+              <input id="OrderQuantity-{{i}}-{{j}}" formControlName="OrderQuantity" type="number" (change)="calculateOrderValue(i, j)" required>
+            </div>
+            <div class="form-group">
+              <label for="DiscountValue-{{i}}-{{j}}">Discount Value</label>
+              <input id="DiscountValue-{{i}}-{{j}}" formControlName="DiscountValue" type="number" (change)="calculateOrderValue(i, j)" required>
+            </div>
+            <div class="form-group">
+              <label for="SurchargeValue-{{i}}-{{j}}">Surcharge Value</label>
+              <input id="SurchargeValue-{{i}}-{{j}}" formControlName="SurchargeValue" type="number" (change)="calculateOrderValue(i, j)" required>
+            </div>
+            <div class="form-group">
+              <label for="OrderValue-{{i}}-{{j}}">Order Value</label>
+              <input id="OrderValue-{{i}}-{{j}}" formControlName="OrderValue" type="number" readonly>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ItemText-{{i}}-{{j}}">Item Text</label>
+              <input id="ItemText-{{i}}-{{j}}" formControlName="ItemText">
+            </div>
+            <div class="form-group">
+              <label for="Usage-{{i}}-{{j}}">Usage</label>
+              <input id="Usage-{{i}}-{{j}}" formControlName="Usage">
+            </div>
+          </div>
+          <button type="button" (click)="removeItem(i, j)">Remove Item</button>
+        </div>
+        <button type="button" (click)="addItem(i)">Add Item</button>
+      </div>
+      <button type="button" (click)="removeDetail(i)">Remove Detail</button>
+    </div>
+    <button type="button" (click)="addDetail()">Add Detail</button>
+  </div>
 
-      <c-row class="mb-3">
-        <c-col md="6">
-          <label cLabel for="validFromDate">Valid From Date</label>
-          <input cFormControl id="validFromDate" formControlName="validFromDate" type="date">
-        </c-col>
-        <c-col md="6">
-          <label cLabel for="validToDate">Valid To Date</label>
-          <input cFormControl id="validToDate" formControlName="validToDate" type="date">
-        </c-col>
-      </c-row>
+  <div class="totals">
+    <p>Total Value: {{quotationForm.get('total_value').value | currency}}</p>
+    <p>Total Discount: {{quotationForm.get('TotalDiscount').value | currency}}</p>
+    <p>GST/VAT Value: {{quotationForm.get('GSTVATValue').value | currency}}</p>
+  </div>
 
-      <c-row class="mb-3">
-        <c-col md="12">
-          <label cLabel for="headerText">Header Text</label>
-          <textarea cFormControl id="headerText" formControlName="headerText" rows="3"></textarea>
-        </c-col>
-      </c-row>
-
-      <app-quote-line-items [parentForm]="quotationForm" (lineItemsChanged)="onLineItemsChanged()">
-      </app-quote-line-items>
-
-      <c-row class="mb-3">
-        <c-col md="6">
-          <label cLabel for="headerTotalDiscount">Header Total Discount</label>
-          <input cFormControl id="headerTotalDiscount" formControlName="headerTotalDiscount" type="number" (input)="calculateTotalSalesValue()">
-        </c-col>
-        <c-col md="6">
-          <label cLabel for="gstVatValue">GST/VAT Value</label>
-          <input cFormControl id="gstVatValue" formControlName="gstVatValue" type="number" (input)="calculateTotalSalesValue()">
-        </c-col>
-      </c-row>
-
-      <c-row class="mb-3">
-        <c-col md="12">
-          <label cLabel for="totalSalesValue">Total Sales Value</label>
-          <input cFormControl id="totalSalesValue" [value]="totalSalesValue" readonly>
-        </c-col>
-      </c-row>
-
-      <c-row>
-        <c-col md="12">
-          <button cButton color="primary" type="submit" [disabled]="quotationForm.invalid || loading">
-            {{ loading ? 'Saving...' : 'Save Quotation' }}
-          </button>
-        </c-col>
-      </c-row>
-    </form>
-  </c-card-body>
-</c-card>
+  <button type="submit" [disabled]="!quotationForm.valid">Create Quotation</button>
+</form>

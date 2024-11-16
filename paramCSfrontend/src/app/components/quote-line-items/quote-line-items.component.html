@@ -1,71 +1,57 @@
 <div [formGroup]="parentForm">
-  <div formArrayName="lineItems">
-    <div *ngFor="let item of lineItems.controls; let i = index" [formGroupName]="i">
-      <c-row class="mb-3">
-        <c-col md="1">
-          <label cLabel>Item</label>
-          <input cFormControl formControlName="item">
-        </c-col>
-        <c-col md="2">
-          <label cLabel>Material No.</label>
-          <input cFormControl formControlName="materialNo">
-        </c-col>
-        <c-col md="2">
-          <label cLabel>Material Description</label>
-          <input cFormControl formControlName="materialDescription">
-        </c-col>
-        <c-col md="1">
-          <label cLabel>Per Price</label>
-          <input cFormControl type="number" formControlName="perPrice" (change)="calculateOrderValue(i)">
-        </c-col>
-        <c-col md="1">
-          <label cLabel>Per</label>
-          <input cFormControl type="number" formControlName="per">
-        </c-col>
-        <c-col md="1">
-          <label cLabel>UoM</label>
-          <input cFormControl formControlName="uom">
-        </c-col>
-        <c-col md="1">
-          <label cLabel>Discount</label>
-          <input cFormControl type="number" formControlName="discountValue" (change)="calculateOrderValue(i)">
-        </c-col>
-        <c-col md="1">
-          <label cLabel>Surcharge</label>
-          <input cFormControl type="number" formControlName="surchargeValue" (change)="calculateOrderValue(i)">
-        </c-col>
-        <c-col md="1">
-          <label cLabel>Quantity</label>
-          <input cFormControl type="number" formControlName="orderQuantity" (change)="calculateOrderValue(i)">
-        </c-col>
-        <c-col md="1">
-          <label cLabel>Order Value</label>
-          <input cFormControl type="number" formControlName="orderValue" readonly>
-        </c-col>
-      </c-row>
-      <c-row class="mb-3">
-        <c-col md="4">
-          <label cLabel>Item Text</label>
-          <input cFormControl formControlName="itemText">
-        </c-col>
-        <c-col md="4">
-          <label cLabel>Usage</label>
-          <select cSelect formControlName="usage">
-            <option value="">Select usage</option>
-            <option value="option1">Option 1</option>
-            <option value="option2">Option 2</option>
-            <option value="option3">Option 3</option>
-          </select>
-        </c-col>
-        <c-col md="3">
-          <label cLabel>Project ID</label>
-          <input cFormControl formControlName="projectId">
-        </c-col>
-        <c-col md="1">
-          <button cButton color="danger" (click)="removeLineItem(i)">Remove</button>
-        </c-col>
-      </c-row>
+  <div formArrayName="details">
+    <div [formGroupName]="detailIndex">
+      <div formArrayName="items">
+        <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="line-item">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="MaterialNumber-{{i}}">Material Number:</label>
+              <input id="MaterialNumber-{{i}}" formControlName="MaterialNumber"
+                     [ngbTypeahead]="searchMaterials"
+                     [resultFormatter]="formatMaterialResult"
+                     [inputFormatter]="formatMaterialResult"
+                     (selectItem)="onMaterialSelected($event, i)"
+                     required>
+            </div>
+            <div class="form-group">
+              <label for="MaterialDescription-{{i}}">Description:</label>
+              <input id="MaterialDescription-{{i}}" formControlName="MaterialDescription" required>
+            </div>
+            <div class="form-group">
+              <label for="PricePer-{{i}}">Price Per:</label>
+              <input id="PricePer-{{i}}" type="number" formControlName="PricePer" (change)="calculateOrderValue(i)" required>
+            </div>
+            <div class="form-group">
+              <label for="Per-{{i}}">Per:</label>
+              <input id="Per-{{i}}" type="number" formControlName="Per" required>
+            </div>
+            <div class="form-group">
+              <label for="UnitOfMeasure-{{i}}">UoM:</label>
+              <input id="UnitOfMeasure-{{i}}" formControlName="UnitOfMeasure" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="OrderQuantity-{{i}}">Quantity:</label>
+              <input id="OrderQuantity-{{i}}" type="number" formControlName="OrderQuantity" (change)="calculateOrderValue(i)" required>
+            </div>
+            <div class="form-group">
+              <label for="DiscountValue-{{i}}">Discount:</label>
+              <input id="DiscountValue-{{i}}" type="number" formControlName="DiscountValue" (change)="calculateOrderValue(i)" required>
+            </div>
+            <div class="form-group">
+              <label for="SurchargeValue-{{i}}">Surcharge:</label>
+              <input id="SurchargeValue-{{i}}" type="number" formControlName="SurchargeValue" (change)="calculateOrderValue(i)" required>
+            </div>
+            <div class="form-group">
+              <label for="OrderValue-{{i}}">Order Value:</label>
+              <input id="OrderValue-{{i}}" type="number" formControlName="OrderValue" readonly>
+            </div>
+          </div>
+          <button type="button" (click)="removeItem(i)" class="btn btn-danger">Remove Item</button>
+        </div>
+      </div>
+      <button type="button" (click)="addItem()" class="btn btn-primary">Add Item</button>
     </div>
   </div>
-  <button cButton color="secondary" (click)="addLineItem()">Add Line Item</button>
 </div>

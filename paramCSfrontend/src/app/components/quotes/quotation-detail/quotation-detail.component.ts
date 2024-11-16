@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { QuotationService, Quotation } from '../../../services/quotation.service';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { QuotationService } from '../../../services/quotation.service';
+import { Quotation, QuotationDetails, QuotationItemDetails, ApprovalStatus } from '../../../models/quotation.model';
+import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
+import { forkJoin, of, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-quotation-detail',
@@ -9,35 +12,151 @@ import { QuotationService, Quotation } from '../../../services/quotation.service
 })
 export class QuotationDetailComponent implements OnInit {
   quotation: Quotation | null = null;
-  loading = true;
-  error = '';
+  quotationDetails: QuotationDetails[] = [];
+  loading = false;
+  error: string | null = null;
+  rejectionReason = '';
+  ApprovalStatus = ApprovalStatus; // Make enum available in template
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private quotationService: QuotationService
   ) { }
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
-      this.loadQuotation(id);
-    } else {
-      this.error = 'Invalid quotation ID';
-      this.loading = false;
-    }
+    this.route.paramMap.pipe(
+      switchMap((params: ParamMap) => {
+        const quoteId = params.get('id');
+        if (quoteId) {
+          this.loading = true;
+          return this.loadQuotationData(quoteId);
+        } else {
+          this.error = 'No quotation ID provided';
+          return of(null);
+        }
+      }),
+      catchError(error => {
+        console.error('Error in quotation detail initialization', error);
+        this.error = 'An error occurred while loading the quotation. Please try again.';
+        return of(null);
+      }),
+      finalize(() => this.loading = false)
+    ).subscribe();
   }
 
-  loadQuotation(id: string): void {
-    this.quotationService.getQuotationById(id).subscribe(
-      (data) => {
-        this.quotation = data;
-        this.loading = false;
-      },
-      (error) => {
-        this.error = 'Failed to load quotation details';
-        this.loading = false;
-        console.error('Error loading quotation:', error);
-      }
+  loadQuotationData(quoteId: string): Observable<any> {
+    return forkJoin({
+      quotation: this.quotationService.getQuotationById(quoteId),
+      details: this.quotationService.getQuotationDetails(quoteId)
+    }).pipe(
+      tap(({ quotation, details }) => {
+        this.quotation = quotation;
+        this.quotationDetails = details;
+      }),
+      catchError(error => {
+        console.error('Error loading quotation data', error);
+        this.error = 'Error loading quotation data. Please try again.';
+        return of(null);
+      })
     );
+  }
+
+  approveQuotation(): void {
+    if (!this.quotation) return;
+
+    this.loading = true;
+    this.error = null;
+    this.quotationService.approveQuotation(this.quotation.QuoteId).pipe(
+      catchError(error => {
+        console.error('Error approving quotation', error);
+        this.error = 'Error approving quotation. Please try again.';
+        return of(null);
+      }),
+      finalize(() => this.loading = false)
+    ).subscribe(updatedQuotation => {
+      if (updatedQuotation) {
+        this.quotation = updatedQuotation;
+      }
+    });
+  }
+
+  rejectQuotation(): void {
+    if (!this.quotation) return;
+    if (!this.rejectionReason.trim()) {
+      this.error = 'Please provide a rejection reason.';
+      return;
+    }
+
+    this.loading = true;
+    this.error = null;
+    this.quotationService.rejectQuotation(this.quotation.QuoteId, this.rejectionReason).pipe(
+      catchError(error => {
+        console.error('Error rejecting quotation', error);
+        this.error = 'Error rejecting quotation. Please try again.';
+        return of(null);
+      }),
+      finalize(() => this.loading = false)
+    ).subscribe(updatedQuotation => {
+      if (updatedQuotation) {
+        this.quotation = updatedQuotation;
+        this.rejectionReason = '';
+      }
+    });
+  }
+
+  reviseQuotation(): void {
+    if (!this.quotation) return;
+
+    this.loading = true;
+    this.error = null;
+    this.quotationService.reviseQuotation(this.quotation.QuoteId).pipe(
+      catchError(error => {
+        console.error('Error revising quotation', error);
+        this.error = 'Error revising quotation. Please try again.';
+        return of(null);
+      }),
+      finalize(() => this.loading = false)
+    ).subscribe(updatedQuotation => {
+      if (updatedQuotation) {
+        this.quotation = updatedQuotation;
+      }
+    });
+  }
+
+  calculateTotalValue(): number {
+    return this.quotationDetails.reduce((total, detail) =>
+      total + detail.items.reduce((itemTotal, item) => itemTotal + item.OrderValue, 0)
+      , 0);
+  }
+
+  calculateTotalDiscount(): number {
+    return this.quotationDetails.reduce((total, detail) =>
+      total + detail.items.reduce((itemTotal, item) => itemTotal + (item.DiscountValue || 0), 0)
+      , 0);
+  }
+
+  calculateTotalSurcharge(): number {
+    return this.quotationDetails.reduce((total, detail) =>
+      total + detail.items.reduce((itemTotal, item) => itemTotal + (item.SurchargeValue || 0), 0)
+      , 0);
+  }
+
+  canApprove(): boolean {
+    return this.quotation?.QStatusID.QStatusName !== ApprovalStatus.Approved;
+  }
+
+  canReject(): boolean {
+    return this.quotation?.QStatusID.QStatusName !== ApprovalStatus.Rejected;
+  }
+
+  canRevise(): boolean {
+    return this.quotation?.QStatusID.QStatusName !== ApprovalStatus.Pending;
+  }
+
+  navigateToEdit(): void {
+    if (this.quotation) {
+      this.router.navigate(['/quotations', this.quotation.QuoteId, 'edit']);
+    }
   }
 }

@@ -59,14 +59,17 @@ import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { UsersComponent } from './components/master/users/users.component';
 import { RolesComponent } from './components/master/roles/roles.component';
+import { QuoteLineItemsComponent } from './components/quote-line-items/quote-line-items.component';
 
 // Import services
 import { AuthService } from './services/auth.service';
 import { DashboardService } from './services/dashboard.service';
+import { CustomerService } from './services/customer.service';
+import { MaterialService } from './services/material.service';
+import { QuotationService } from './services/quotation.service';
 
 // Import interceptors
 import { AuthInterceptor } from './auth.interceptor';
-import { QuoteLineItemsComponent } from './components/quote-line-items/quote-line-items.component';
 
 @NgModule({
   declarations: [
@@ -120,8 +123,11 @@ import { QuoteLineItemsComponent } from './components/quote-line-items/quote-lin
     IconSetService,
     AuthService,
     DashboardService,
+    CustomerService,
+    MaterialService,
+    QuotationService,
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    { provide: API_URL, useValue: environment.apiUrl } // Add this line
+    { provide: API_URL, useValue: environment.apiUrl }
   ],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
