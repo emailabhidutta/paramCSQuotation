@@ -144,9 +144,9 @@
   </div>
 
   <div class="totals">
-    <p>Total Value: {{quotationForm.get('total_value').value | currency}}</p>
-    <p>Total Discount: {{quotationForm.get('TotalDiscount').value | currency}}</p>
-    <p>GST/VAT Value: {{quotationForm.get('GSTVATValue').value | currency}}</p>
+    <p>Total Value: {{totalValue | currency}}</p>
+    <p>Total Discount: {{totalDiscount | currency}}</p>
+    <p>GST/VAT Value: {{gstVatValue | currency}}</p>
   </div>
 
   <button type="submit" [disabled]="!quotationForm.valid">Create Quotation</button>

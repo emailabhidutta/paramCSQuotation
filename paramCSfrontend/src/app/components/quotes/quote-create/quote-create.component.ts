@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, Validators, AbstractControl } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { QuotationService } from '../../../services/quotation.service';
 import { CustomerService } from '../../../services/customer.service';
@@ -7,11 +7,22 @@ import { MaterialService } from '../../../services/material.service';
 import { Quotation, QuotationStatus, SalesOrganization, Currency, CustomerMaster, MaterialMaster, MaterialDisplayOption, ApprovalStatus } from '../../../models/quotation.model';
 import { Observable, forkJoin, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, catchError, finalize } from 'rxjs/operators';
+import { CommonModule, CurrencyPipe } from '@angular/common';
+import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
+import { QuoteLineItemsComponent } from '../../quote-line-items/quote-line-items.component';
 
 @Component({
   selector: 'app-quote-create',
   templateUrl: './quote-create.component.html',
-  styleUrls: ['./quote-create.component.css']
+  styleUrls: ['./quote-create.component.css'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    NgbTypeaheadModule,
+    QuoteLineItemsComponent,
+    CurrencyPipe
+  ]
 })
 export class QuoteCreateComponent implements OnInit {
   quotationForm!: FormGroup;
@@ -35,6 +46,18 @@ export class QuoteCreateComponent implements OnInit {
     this.loadInitialData();
   }
 
+  get totalValue(): number {
+    return this.quotationForm.get('total_value')?.value || 0;
+  }
+
+  get totalDiscount(): number {
+    return this.quotationForm.get('TotalDiscount')?.value || 0;
+  }
+
+  get gstVatValue(): number {
+    return this.quotationForm.get('GSTVATValue')?.value || 0;
+  }
+
   initForm(): void {
     this.quotationForm = this.fb.group({
       QuotationNo: [''],
@@ -55,7 +78,6 @@ export class QuoteCreateComponent implements OnInit {
       details: this.fb.array([this.createDetailForm()])
     });
 
-    // Add listeners for GSTVATValue and TotalDiscount
     this.quotationForm.get('GSTVATValue')?.valueChanges.subscribe(() => this.calculateTotals());
     this.quotationForm.get('TotalDiscount')?.valueChanges.subscribe(() => this.calculateTotals());
   }
@@ -176,7 +198,6 @@ export class QuoteCreateComponent implements OnInit {
       CustomerNumber: customer.CustomerNumber,
       CustomerEmail: customer.Email
     });
-    // Update other fields based on the selected customer
     const firstDetail = this.details.at(0);
     if (firstDetail) {
       firstDetail.patchValue({
@@ -244,12 +265,7 @@ export class QuoteCreateComponent implements OnInit {
       }
     });
 
-    // Get the manually entered GSTVATValue and TotalDiscount
-    const gstVatValue = this.quotationForm.get('GSTVATValue')?.value || 0;
-    const totalDiscount = this.quotationForm.get('TotalDiscount')?.value || 0;
-
-    // Calculate the final total value
-    const finalTotalValue = totalValue - totalDiscount + gstVatValue;
+    const finalTotalValue = totalValue - this.totalDiscount + this.gstVatValue;
 
     this.quotationForm.patchValue({
       total_value: finalTotalValue

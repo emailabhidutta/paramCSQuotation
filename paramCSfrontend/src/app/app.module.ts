@@ -2,6 +2,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA, InjectionToken } from '@angular/core'
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -50,7 +51,8 @@ import { ChartjsModule } from '@coreui/angular-chartjs';
 // Import components
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { LoginComponent } from './components/login/login.component';
-import { QuoteCreateComponent } from './components/quotes/quote-create/quote-create.component';
+// Remove this import as QuoteCreateComponent is now standalone
+// import { QuoteCreateComponent } from './components/quotes/quote-create/quote-create.component';
 import { QuotesAllComponent } from './components/quotes/quotes-all/quotes-all.component';
 import { QuotesAcceptedComponent } from './components/quotes/quotes-accepted/quotes-accepted.component';
 import { QuotesRejectedComponent } from './components/quotes/quotes-rejected/quotes-rejected.component';
@@ -59,7 +61,6 @@ import { HeaderComponent } from './components/header/header.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { UsersComponent } from './components/master/users/users.component';
 import { RolesComponent } from './components/master/roles/roles.component';
-import { QuoteLineItemsComponent } from './components/quote-line-items/quote-line-items.component';
 
 // Import services
 import { AuthService } from './services/auth.service';
@@ -76,7 +77,7 @@ import { AuthInterceptor } from './auth.interceptor';
     AppComponent,
     DashboardComponent,
     LoginComponent,
-    QuoteCreateComponent,
+    // Remove QuoteCreateComponent from here
     QuotesAllComponent,
     QuotesAcceptedComponent,
     QuotesRejectedComponent,
@@ -84,8 +85,7 @@ import { AuthInterceptor } from './auth.interceptor';
     HeaderComponent,
     FooterComponent,
     UsersComponent,
-    RolesComponent,
-    QuoteLineItemsComponent
+    RolesComponent
   ],
   imports: [
     BrowserModule,
@@ -117,7 +117,8 @@ import { AuthInterceptor } from './auth.interceptor';
     IconModule,
     IconSetModule,
     ChartjsModule,
-    WidgetModule
+    WidgetModule,
+    NgbModule
   ],
   providers: [
     IconSetService,

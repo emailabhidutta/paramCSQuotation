@@ -4,11 +4,15 @@ import { QuotationService } from '../../../services/quotation.service';
 import { Quotation, QuotationDetails, QuotationItemDetails, ApprovalStatus } from '../../../models/quotation.model';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { forkJoin, of, Observable } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-quotation-detail',
   templateUrl: './quotation-detail.component.html',
-  styleUrls: ['./quotation-detail.component.css']
+  styleUrls: ['./quotation-detail.component.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule]
 })
 export class QuotationDetailComponent implements OnInit {
   quotation: Quotation | null = null;
