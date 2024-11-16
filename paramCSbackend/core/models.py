@@ -12,7 +12,7 @@ class Role(models.Model):
     class Meta:
         verbose_name = "Role"
         verbose_name_plural = "Roles"
-        db_table = 'core_role'  # Specify the exact table name
+        db_table = 'core_role'
 
 class Rights(models.Model):
     RightsID = models.CharField(max_length=4, primary_key=True)
@@ -24,7 +24,7 @@ class Rights(models.Model):
     class Meta:
         verbose_name = "Right"
         verbose_name_plural = "Rights"
-        db_table = 'core_rights'  # Specify the exact table name
+        db_table = 'core_rights'
 
 class UserRights(models.Model):
     UserRightsID = models.CharField(max_length=4, primary_key=True)
@@ -38,7 +38,7 @@ class UserRights(models.Model):
         verbose_name = "User Right"
         verbose_name_plural = "User Rights"
         unique_together = ('RoleID', 'RightsID')
-        db_table = 'core_userrights'  # Specify the exact table name
+        db_table = 'core_userrights'
 
 class CustomUser(AbstractUser):
     EmployeeNo = models.CharField(max_length=10, null=True, blank=True)
@@ -51,7 +51,6 @@ class CustomUser(AbstractUser):
     reset_password_token = models.CharField(max_length=100, null=True, blank=True)
     reset_password_expires = models.DateTimeField(null=True, blank=True)
 
-    # Override the default fields to match your database
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -104,4 +103,4 @@ class CustomUser(AbstractUser):
     class Meta:
         verbose_name = "User"
         verbose_name_plural = "Users"
-        db_table = 'auth_user'  # Specify the exact table name
+        db_table = 'auth_user'

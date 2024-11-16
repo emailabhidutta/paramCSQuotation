@@ -67,6 +67,15 @@
     <Compile Include="finance\views.py" />
     <Compile Include="finance\__init__.py" />
     <Compile Include="manage.py" />
+    <Compile Include="master_data\admin.py" />
+    <Compile Include="master_data\apps.py" />
+    <Compile Include="master_data\migrations\__init__.py" />
+    <Compile Include="master_data\models.py" />
+    <Compile Include="master_data\serializers.py" />
+    <Compile Include="master_data\tests.py" />
+    <Compile Include="master_data\urls.py" />
+    <Compile Include="master_data\views.py" />
+    <Compile Include="master_data\__init__.py" />
     <Compile Include="paramCSbackend\__init__.py" />
     <Compile Include="paramCSbackend\settings.py" />
     <Compile Include="paramCSbackend\urls.py" />
@@ -99,6 +108,8 @@
     <Folder Include="core\migrations\__pycache__\" />
     <Folder Include="finance\" />
     <Folder Include="finance\migrations\" />
+    <Folder Include="master_data\" />
+    <Folder Include="master_data\migrations\" />
     <Folder Include="paramCSbackend\" />
     <Folder Include="quotation\" />
     <Folder Include="quotation\migrations\" />

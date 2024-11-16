@@ -1,5 +1,7 @@
-from django.contrib.auth.models import User
+import logging
 from rest_framework import permissions
+
+logger = logging.getLogger(__name__)
 
 class IsAdminUser(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -10,8 +12,9 @@ class IsSalesManager(permissions.BasePermission):
         if not request.user.is_authenticated:
             return False
         try:
-            return request.user.customuser.RoleID.RoleName == 'Sales Manager'
-        except AttributeError:
+            return request.user.RoleID is not None and request.user.RoleID.RoleName == 'Sales Manager'
+        except AttributeError as e:
+            logger.error(f"Error checking IsSalesManager permission: {str(e)}")
             return False
 
 class IsSalesUser(permissions.BasePermission):
@@ -19,8 +22,9 @@ class IsSalesUser(permissions.BasePermission):
         if not request.user.is_authenticated:
             return False
         try:
-            return request.user.customuser.RoleID.RoleName == 'Sales User'
-        except AttributeError:
+            return request.user.RoleID is not None and request.user.RoleID.RoleName == 'Sales User'
+        except AttributeError as e:
+            logger.error(f"Error checking IsSalesUser permission: {str(e)}")
             return False
 
 class IsAdminOrSalesManagerOrSalesUser(permissions.BasePermission):
@@ -30,9 +34,9 @@ class IsAdminOrSalesManagerOrSalesUser(permissions.BasePermission):
         if request.user.is_staff:
             return True
         try:
-            role_name = request.user.customuser.RoleID.RoleName
-            return role_name in ['Sales Manager', 'Sales User']
-        except AttributeError:
+            return request.user.RoleID is not None and request.user.RoleID.RoleName in ['Sales Manager', 'Sales User']
+        except AttributeError as e:
+            logger.error(f"Error checking IsAdminOrSalesManagerOrSalesUser permission: {str(e)}")
             return False
 
 class IsAdminOrSalesManager(permissions.BasePermission):
@@ -42,6 +46,7 @@ class IsAdminOrSalesManager(permissions.BasePermission):
         if request.user.is_staff:
             return True
         try:
-            return request.user.customuser.RoleID.RoleName == 'Sales Manager'
-        except AttributeError:
+            return request.user.RoleID is not None and request.user.RoleID.RoleName == 'Sales Manager'
+        except AttributeError as e:
+            logger.error(f"Error checking IsAdminOrSalesManager permission: {str(e)}")
             return False

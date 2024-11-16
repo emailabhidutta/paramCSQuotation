@@ -1,6 +1,6 @@
 from django.db import connection, transaction
 from django.db.utils import OperationalError, ProgrammingError
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from rest_framework import status, viewsets, filters, serializers
 from django_filters.rest_framework import DjangoFilterBackend
@@ -149,13 +149,41 @@ class QuotationViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         serializer.save(last_modified_by=self.request.user)
 
+    @action(detail=True, methods=['post'])
+    def approve(self, request, pk=None):
+        quotation = self.get_object()
+        try:
+            quotation.approve(request.user)
+            return Response({'status': 'quotation approved'})
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def reject(self, request, pk=None):
+        quotation = self.get_object()
+        reason = request.data.get('reason', '')
+        try:
+            quotation.reject(request.user, reason)
+            return Response({'status': 'quotation rejected'})
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def revise(self, request, pk=None):
+        quotation = self.get_object()
+        try:
+            quotation.revise(request.user)
+            return Response({'status': 'quotation revised'})
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 class QuotationDetailsViewSet(viewsets.ModelViewSet):
     queryset = QuotationDetails.objects.all()
     serializer_class = QuotationDetailsSerializer
     permission_classes = [IsSalesUser | IsSalesManager | IsAdminUser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['QuoteId', 'SalesOrganization', 'SoldToCustomerNumber']
-    search_fields = ['CustomerName', 'CustomerName2']
+    filterset_fields = ['QuoteId', 'SalesOrganization', 'Customer']
+    search_fields = ['Customer']
     ordering_fields = ['QuoteRevisionDate']
 
 class QuotationItemDetailsViewSet(viewsets.ModelViewSet):
@@ -166,3 +194,10 @@ class QuotationItemDetailsViewSet(viewsets.ModelViewSet):
     filterset_fields = ['QuotationDetailsId', 'MaterialNumber']
     search_fields = ['MaterialDescription', 'CustomerMatNumber']
     ordering_fields = ['OrderQuantity', 'OrderValue']
+
+    @action(detail=True, methods=['post'])
+    def soft_delete(self, request, pk=None):
+        item = self.get_object()
+        item.IsDeleted = True
+        item.save()
+        return Response({'status': 'item soft deleted'})

@@ -7,6 +7,9 @@ class CurrencySerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CurrencyExchangeSerializer(serializers.ModelSerializer):
+    from_currency_name = serializers.CharField(source='FromCurrencyID.CurrencyName', read_only=True)
+    to_currency_name = serializers.CharField(source='ToCurrencyID.CurrencyName', read_only=True)
+
     class Meta:
         model = CurrencyExchange
         fields = '__all__'

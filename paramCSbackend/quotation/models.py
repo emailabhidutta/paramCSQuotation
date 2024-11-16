@@ -21,7 +21,7 @@ class Quotation(models.Model):
     CustomerNumber = models.CharField(max_length=10)
     LastRevision = models.CharField(max_length=2)
     CustomerInquiryNo = models.CharField(max_length=35, null=True, blank=True)
-    Date = models.DateField(auto_now_add=True)
+    Date = models.DateField(default=timezone.now)
     CreationDate = models.DateField(auto_now_add=True)
     QStatusID = models.ForeignKey(QuotationStatus, on_delete=models.PROTECT, related_name='quotations')
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='created_quotations')
@@ -32,6 +32,9 @@ class Quotation(models.Model):
     QuoteValidUntil = models.DateField(null=True, blank=True)
     CustomerEmail = models.EmailField(max_length=254, null=True, blank=True)
     Version = models.PositiveIntegerField(default=1)
+    Remarks = models.TextField(null=True, blank=True)
+    GSTVATValue = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    TotalDiscount = models.DecimalField(max_digits=15, decimal_places=2, default=0)
 
     def __str__(self):
         return f"{self.QuotationNo} - Rev {self.LastRevision}"
@@ -42,13 +45,21 @@ class Quotation(models.Model):
         ordering = ['-CreationDate', 'QuotationNo']
 
     def clean(self):
+        super().clean()
         if self.Date > timezone.now().date():
             raise ValidationError("Quotation date cannot be in the future.")
         if self.QuoteValidFrom and self.QuoteValidUntil and self.QuoteValidFrom > self.QuoteValidUntil:
             raise ValidationError("Valid from date must be before valid until date.")
+        if self.QuoteValidFrom and self.QuoteValidFrom < (timezone.now().date() - timezone.timedelta(days=30)):
+            raise ValidationError("Cannot backdate more than 1 month.")
 
     def calculate_total_value(self):
-        self.total_value = sum(item.OrderValue for detail in self.quotationdetails_set.all() for item in detail.quotationitemdetails_set.all())
+        self.total_value = sum(item.OrderValue for detail in self.details.all() for item in detail.items.filter(IsDeleted=False))
+        self.total_value -= self.TotalDiscount
+        self.save()
+
+    def calculate_gst_vat(self, rate=0.1):  # 10% rate as an example
+        self.GSTVATValue = self.total_value * rate
         self.save()
 
     def approve(self, approver):
@@ -93,8 +104,15 @@ class Quotation(models.Model):
             CustomerEmail=self.CustomerEmail,
             QuoteValidFrom=self.QuoteValidFrom,
             QuoteValidUntil=self.QuoteValidUntil,
+            Remarks=self.Remarks,
         )
         return new_quote
+
+    def delete_item(self, item_id):
+        item = self.details.get(items__id=item_id).items.get(id=item_id)
+        item.IsDeleted = True
+        item.save()
+        self.calculate_total_value()
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -107,7 +125,7 @@ class QuotationDetails(models.Model):
     QuoteRevisionDate = models.DateField(null=True, blank=True)
     SalesOrganization = models.ForeignKey(SalesOrganization, on_delete=models.PROTECT)
     CustomerInquiryNo = models.CharField(max_length=35, null=True, blank=True)
-    SoldToCustomerNumber = models.CharField(max_length=10)
+    SoldToCustomerNumber = models.CharField(max_length=10, null=True, blank=True)
     ShipToCustomerNumber = models.CharField(max_length=10, null=True, blank=True)
     SalesGroup = models.CharField(max_length=3, null=True, blank=True)
     Customer = models.CharField(max_length=35, null=True, blank=True)
@@ -125,6 +143,8 @@ class QuotationDetails(models.Model):
     CustomerPONumber = models.CharField(max_length=35, null=True, blank=True)
     ApprovalStatus = models.CharField(max_length=1)
     Version = models.PositiveIntegerField(default=1)
+    PaymentTerms = models.CharField(max_length=100, null=True, blank=True)
+    DeliveryMethod = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return f"{self.QuoteId.QuotationNo} - {self.QuoteRevisionNo}"
@@ -155,6 +175,7 @@ class QuotationItemDetails(models.Model):
     OrderValue = models.DecimalField(max_digits=15, decimal_places=2)
     ItemText = models.CharField(max_length=255, null=True, blank=True)
     Usage = models.CharField(max_length=1, null=True, blank=True)
+    IsDeleted = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.QuotationDetailsId.QuoteId.QuotationNo} - {self.MaterialNumber}"
