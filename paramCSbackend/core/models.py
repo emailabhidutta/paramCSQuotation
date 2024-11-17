@@ -1,45 +1,12 @@
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.hashers import make_password, check_password
 import logging
+from .managers import CustomUserManager
 
 logger = logging.getLogger(__name__)
-
-class CustomUser(AbstractBaseUser, PermissionsMixin):
-    def create_user(self, Name, Email, EmployeeNo, password=None, **extra_fields):
-        if not Name:
-            raise ValueError('The Name field must be set')
-        if not Email:
-            raise ValueError('The Email field must be set')
-        if not password:
-            raise ValueError('The password must be set')
-        
-        user = self.model(Name=Name, Email=Email, EmployeeNo=EmployeeNo, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        logger.debug(f"User created successfully: {user}")
-        return user
-
-    def create_superuser(self, Name, Email, EmployeeNo, password=None, **extra_fields):
-        extra_fields.setdefault('IsActive', '1')
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-
-        if not extra_fields.get('RoleID'):
-            try:
-                admin_role, created = Role.objects.get_or_create(
-                    RoleID='ADMN',
-                    defaults={'RoleName': 'Administrator'}
-                )
-                extra_fields['RoleID'] = admin_role
-            except Exception as e:
-                logger.error(f"Error creating admin role: {str(e)}")
-                raise
-
-        logger.info(f"Creating superuser with Name: {Name}, Email: {Email}, EmployeeNo: {EmployeeNo}")
-        return self.create_user(Name, Email, EmployeeNo, password, **extra_fields)
 
 class Role(models.Model):
     RoleID = models.CharField(max_length=4, primary_key=True)
@@ -57,7 +24,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     Name = models.CharField(_('name'), max_length=50, unique=True)
     Email = models.EmailField(_('email address'), unique=True)
     EmployeeNo = models.CharField(max_length=10, null=True, blank=True)
-    IsActive = models.CharField(max_length=1, default='1')
+    IsActive = models.BooleanField(default=True)
     RoleID = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, db_column='RoleID')
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
@@ -75,7 +42,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     @property
     def is_active(self):
-        return self.IsActive == '1'
+        return self.IsActive
 
     def set_password(self, raw_password):
         logger.debug(f"Setting password for user {self.Name}")
@@ -83,26 +50,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         logger.debug(f"New password hash: {self.password}")
 
     def check_password(self, raw_password):
-        """
-        Return a boolean of whether the raw_password was correct. Handles
-        hashing formats behind the scenes.
-        """
-        logger.debug(f"Checking password for user: {self.Name}")
+        logger.debug(f"Checking password for user {self.Name}")
         logger.debug(f"Stored hash: {self.password}")
-        
-        def setter(raw_password):
-            self.set_password(raw_password)
-            self.save(update_fields=["password"])
-
-        result = check_password(raw_password, self.password, setter)
-        logger.debug(f"Password check result: {result}")
+        logger.debug(f"Raw password: {raw_password}")
+        result = check_password(raw_password, self.password)
+        logger.debug(f"Check result: {result}")
         return result
 
     def save(self, *args, **kwargs):
         logger.debug(f"Saving user {self.Name}")
-        if not self.UserID:
-            logger.debug("New user, setting password")
-            self.set_password(self.password)
         super().save(*args, **kwargs)
         logger.debug(f"User saved. Password hash: {self.password}")
 
@@ -157,7 +113,7 @@ class UserProfile(models.Model):
 
     def soft_delete(self):
         self.is_deleted = True
-        self.user.IsActive = '0'
+        self.user.IsActive = False
         self.user.save()
         self.save()
 

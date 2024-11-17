@@ -117,6 +117,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Password Hashers
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+]
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 LANGUAGE_CODE = 'en-us'
@@ -213,6 +219,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
         },
+        'django.contrib.auth': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
     'root': {
         'handlers': ['console', 'file'],
@@ -240,7 +251,5 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = 'core.CustomUser'
 
 # Custom authentication backend
-AUTHENTICATION_BACKENDS = [
-    'core.backends.CustomAuthBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
+AUTHENTICATION_BACKENDS = ['core.backends.CustomAuthBackend', 'django.contrib.auth.backends.ModelBackend']
+ADMIN_LOG_ENTRY = 'paramCSbackend.custom_admin.CustomLogEntry'

@@ -12,18 +12,20 @@ class QuotationStatus(models.Model):
         return self.QStatusName
 
     class Meta:
+        managed = False
+        db_table = 'QuotationStatus'
         verbose_name = "Quotation Status"
         verbose_name_plural = "Quotation Statuses"
 
 class Quotation(models.Model):
-    QuoteId = models.CharField(max_length=8, primary_key=True)
+    QuoteID = models.CharField(max_length=8, primary_key=True)
     QuotationNo = models.CharField(max_length=8, unique=True)
     CustomerNumber = models.CharField(max_length=10)
     LastRevision = models.CharField(max_length=2)
     CustomerInquiryNo = models.CharField(max_length=35, null=True, blank=True)
     Date = models.DateField(default=timezone.now)
     CreationDate = models.DateField(auto_now_add=True)
-    QStatusID = models.ForeignKey(QuotationStatus, on_delete=models.PROTECT, related_name='quotations')
+    QStatusID = models.ForeignKey(QuotationStatus, on_delete=models.PROTECT, db_column='QStatusID', related_name='quotations')
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='created_quotations')
     last_modified_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='modified_quotations')
     total_value = models.DecimalField(max_digits=15, decimal_places=2, default=0)
@@ -40,9 +42,17 @@ class Quotation(models.Model):
         return f"{self.QuotationNo} - Rev {self.LastRevision}"
 
     class Meta:
+        managed = False
+        db_table = 'Quotation'
         verbose_name = "Quotation"
         verbose_name_plural = "Quotations"
         ordering = ['-CreationDate', 'QuotationNo']
+
+    @property
+    def is_valid(self):
+        today = timezone.now().date()
+        return (self.QuoteValidFrom is None or self.QuoteValidFrom <= today) and \
+               (self.QuoteValidUntil is None or today <= self.QuoteValidUntil)
 
     def clean(self):
         super().clean()
@@ -94,12 +104,6 @@ class Quotation(models.Model):
         self.last_modified_by = reviser
         self.save()
 
-    @property
-    def is_valid(self):
-        today = timezone.now().date()
-        return (self.QuoteValidFrom is None or self.QuoteValidFrom <= today) and \
-               (self.QuoteValidUntil is None or today <= self.QuoteValidUntil)
-
     @classmethod
     def get_latest_revision(cls, quotation_no):
         return cls.objects.filter(QuotationNo=quotation_no).order_by('-LastRevision').first()
@@ -127,11 +131,11 @@ class Quotation(models.Model):
         self.calculate_total_value()
 
     def save(self, *args, **kwargs):
-        if not self.QuoteId:
-            self.QuoteId = self.generate_quote_id()
+        if not self.QuoteID:
+            self.QuoteID = self.generate_quote_id()
         
         if not self.QuotationNo:
-            self.QuotationNo = self.QuoteId
+            self.QuotationNo = self.QuoteID
 
         if not self.QStatusID_id:
             draft_status = QuotationStatus.objects.get(QStatusName='Draft')
@@ -144,10 +148,10 @@ class Quotation(models.Model):
         today = timezone.now().date()
         prefix = f'Q{today.strftime("%y%m%d")}'
         
-        latest_quote = Quotation.objects.filter(QuoteId__startswith=prefix).order_by('-QuoteId').first()
+        latest_quote = Quotation.objects.filter(QuoteID__startswith=prefix).order_by('-QuoteID').first()
         
         if latest_quote:
-            latest_number = int(latest_quote.QuoteId[7:])
+            latest_number = int(latest_quote.QuoteID[7:])
             new_number = latest_number + 1
         else:
             new_number = 1
@@ -158,10 +162,10 @@ class Quotation(models.Model):
 
 class QuotationDetails(models.Model):
     QuotationDetailsId = models.AutoField(primary_key=True)
-    QuoteId = models.ForeignKey(Quotation, on_delete=models.CASCADE, related_name='details')
+    QuoteID = models.ForeignKey(Quotation, on_delete=models.CASCADE, db_column='QuoteID', related_name='details')
     QuoteRevisionNo = models.CharField(max_length=2)
     QuoteRevisionDate = models.DateField(default=timezone.now)
-    SalesOrganization = models.ForeignKey(SalesOrganization, on_delete=models.PROTECT)
+    SalesOrganization_id = models.ForeignKey(SalesOrganization, on_delete=models.PROTECT, db_column='SalesOrganizationID')
     CustomerInquiryNo = models.CharField(max_length=35, null=True, blank=True)
     SoldToCustomerNumber = models.CharField(max_length=10)
     ShipToCustomerNumber = models.CharField(max_length=10, null=True, blank=True)
@@ -183,13 +187,13 @@ class QuotationDetails(models.Model):
     CustomerPONumber = models.CharField(max_length=35, null=True, blank=True)
     ApprovalStatus = models.CharField(max_length=1)
     Version = models.PositiveIntegerField(default=1)
-    PaymentTerms = models.CharField(max_length=100, null=True, blank=True)
-    DeliveryMethod = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.QuoteId.QuotationNo} - {self.QuoteRevisionNo}"
+        return f"{self.QuoteID.QuotationNo} - {self.QuoteRevisionNo}"
 
     class Meta:
+        managed = False
+        db_table = 'QuotationDetails'
         verbose_name = "Quotation Detail"
         verbose_name_plural = "Quotation Details"
 
@@ -199,7 +203,7 @@ class QuotationDetails(models.Model):
 
 class QuotationItemDetails(models.Model):
     QuoteItemId = models.AutoField(primary_key=True)
-    QuotationDetailsId = models.ForeignKey(QuotationDetails, on_delete=models.CASCADE, related_name='items')
+    QuotationDetailsId = models.ForeignKey(QuotationDetails, on_delete=models.CASCADE, db_column='QuotationDetailsId', related_name='items')
     MaterialNumber = models.CharField(max_length=18)
     CustomerMatNumber = models.CharField(max_length=18, null=True, blank=True)
     FullMaterialDescription = models.CharField(max_length=255, null=True, blank=True)
@@ -218,9 +222,11 @@ class QuotationItemDetails(models.Model):
     IsDeleted = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.QuotationDetailsId.QuoteId.QuotationNo} - {self.MaterialNumber}"
+        return f"{self.QuotationDetailsId.QuoteID.QuotationNo} - {self.MaterialNumber}"
 
     class Meta:
+        managed = False
+        db_table = 'QuotationItemDetails'
         verbose_name = "Quotation Item Detail"
         verbose_name_plural = "Quotation Item Details"
 

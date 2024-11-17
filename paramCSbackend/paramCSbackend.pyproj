@@ -53,6 +53,7 @@
     <Compile Include="core\management\commands\reset_password.py" />
     <Compile Include="core\management\commands\test_password.py" />
     <Compile Include="core\management\commands\verify_user.py" />
+    <Compile Include="core\managers.py" />
     <Compile Include="core\migrations\__init__.py" />
     <Compile Include="core\models.py" />
     <Compile Include="core\permissions.py" />
@@ -80,6 +81,7 @@
     <Compile Include="master_data\urls.py" />
     <Compile Include="master_data\views.py" />
     <Compile Include="master_data\__init__.py" />
+    <Compile Include="paramCSbackend\custom_admin.py" />
     <Compile Include="paramCSbackend\__init__.py" />
     <Compile Include="paramCSbackend\settings.py" />
     <Compile Include="paramCSbackend\urls.py" />
