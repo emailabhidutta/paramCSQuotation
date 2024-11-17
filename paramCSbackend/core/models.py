@@ -1,10 +1,20 @@
+import uuid
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 
-class Role(models.Model):
-    RoleID = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, related_name='child_roles', db_column='RoleID')
-    RoleName = models.CharField(max_length=50, unique=True)
+class TimeStampedModel(models.Model):
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+class Role(TimeStampedModel):
+    id = models.BigAutoField(primary_key=True)
+    ParentRoleID = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='child_roles', db_column='ParentRoleID')
+    RoleName = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.RoleName
@@ -13,8 +23,11 @@ class Role(models.Model):
         verbose_name = "Role"
         verbose_name_plural = "Roles"
         db_table = 'core_role'
+        indexes = [
+            models.Index(fields=['RoleName']),
+        ]
 
-class Rights(models.Model):
+class Rights(TimeStampedModel):
     RightsID = models.CharField(max_length=4, primary_key=True)
     RightName = models.CharField(max_length=50, unique=True)
 
@@ -25,10 +38,13 @@ class Rights(models.Model):
         verbose_name = "Right"
         verbose_name_plural = "Rights"
         db_table = 'core_rights'
+        indexes = [
+            models.Index(fields=['RightName']),
+        ]
 
-class UserRights(models.Model):
-    UserRightsID = models.CharField(max_length=4, primary_key=True)
-    RoleID = models.ForeignKey(Role, on_delete=models.CASCADE, related_name='user_rights')
+class UserRights(TimeStampedModel):
+    UserRightsID = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    RoleID = models.ForeignKey(Role, on_delete=models.CASCADE, related_name='user_rights', db_column='RoleID_id')
     RightsID = models.ForeignKey(Rights, on_delete=models.CASCADE, related_name='user_rights')
 
     def __str__(self):
@@ -39,23 +55,30 @@ class UserRights(models.Model):
         verbose_name_plural = "User Rights"
         unique_together = ('RoleID', 'RightsID')
         db_table = 'core_userrights'
+        indexes = [
+            models.Index(fields=['RoleID', 'RightsID']),
+        ]
 
 class CustomUser(AbstractUser):
-    EmployeeNo = models.CharField(max_length=10, null=True, blank=True)
+    DEPARTMENT_CHOICES = [
+        ('HR', 'Human Resources'),
+        ('IT', 'Information Technology'),
+        ('SALES', 'Sales'),
+        ('FINANCE', 'Finance'),
+        ('OPERATIONS', 'Operations'),
+        ('MARKETING', 'Marketing'),
+        ('OTHER', 'Other'),
+    ]
+
+    EmployeeNo = models.CharField(max_length=10, null=True, blank=True, db_index=True)
     IsActive = models.BooleanField(default=True)
-    RoleID = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, related_name='role_users', db_column='RoleID')
+    RoleID = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, related_name='users', db_column='RoleID')
     PhoneNumber = models.CharField(max_length=15, null=True, blank=True)
-    Department = models.CharField(max_length=50, null=True, blank=True)
+    Department = models.CharField(max_length=50, choices=DEPARTMENT_CHOICES, null=True, blank=True)
     UserID = models.CharField(max_length=4, unique=True, null=True, blank=True)
     is_deleted = models.BooleanField(default=False)
     reset_password_token = models.CharField(max_length=100, null=True, blank=True)
     reset_password_expires = models.DateTimeField(null=True, blank=True)
-
-    is_superuser = models.BooleanField(default=False)
-    is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
-    date_joined = models.DateTimeField(auto_now_add=True)
-    last_login = models.DateTimeField(null=True, blank=True)
 
     groups = models.ManyToManyField(
         Group,
@@ -82,8 +105,20 @@ class CustomUser(AbstractUser):
             return UserRights.objects.filter(RoleID=self.RoleID)
         return UserRights.objects.none()
 
+    def get_all_rights(self):
+        if not self.RoleID:
+            return set()
+        
+        rights = set(self.get_user_rights().values_list('RightsID__RightName', flat=True))
+        current_role = self.RoleID
+        while current_role.ParentRoleID:  # Traverse up the role hierarchy
+            parent_rights = UserRights.objects.filter(RoleID=current_role.ParentRoleID).values_list('RightsID__RightName', flat=True)
+            rights.update(parent_rights)
+            current_role = current_role.ParentRoleID
+        return rights
+
     def has_right(self, right_name):
-        return self.get_user_rights().filter(RightsID__RightName=right_name).exists()
+        return right_name in self.get_all_rights()
 
     def has_role(self, role_name):
         return self.RoleID and self.RoleID.RoleName == role_name
@@ -104,3 +139,12 @@ class CustomUser(AbstractUser):
         verbose_name = "User"
         verbose_name_plural = "Users"
         db_table = 'auth_user'
+        constraints = [
+            models.CheckConstraint(check=models.Q(is_active=True) | models.Q(is_deleted=True), name='active_or_deleted'),
+        ]
+        indexes = [
+            models.Index(fields=['username']),
+            models.Index(fields=['email']),
+            models.Index(fields=['EmployeeNo']),
+            models.Index(fields=['Department']),
+        ]

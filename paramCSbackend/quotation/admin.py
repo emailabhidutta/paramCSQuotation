@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import QuotationStatus, Quotation, QuotationDetails, QuotationItemDetails
 
 @admin.register(QuotationStatus)
@@ -19,11 +20,11 @@ class QuotationDetailsInline(admin.StackedInline):
 
 @admin.register(Quotation)
 class QuotationAdmin(admin.ModelAdmin):
-    list_display = ('QuoteId', 'QuotationNo', 'CustomerNumber', 'Date', 'QStatusID', 'total_value', 'Version')
+    list_display = ('QuoteId', 'QuotationNo', 'CustomerNumber', 'Date', 'status_with_color', 'total_value', 'Version', 'is_valid')
     list_filter = ('QStatusID', 'Date', 'CreationDate')
     search_fields = ('QuoteId', 'QuotationNo', 'CustomerNumber')
     inlines = [QuotationDetailsInline]
-    readonly_fields = ('CreationDate', 'created_by', 'last_modified_by', 'total_value')
+    readonly_fields = ('CreationDate', 'created_by', 'last_modified_by', 'total_value', 'is_valid')
     fieldsets = (
         ('Basic Info', {
             'fields': ('QuoteId', 'QuotationNo', 'CustomerNumber', 'LastRevision', 'CustomerInquiryNo', 'Date')
@@ -32,7 +33,7 @@ class QuotationAdmin(admin.ModelAdmin):
             'fields': ('CreationDate', 'QuoteValidFrom', 'QuoteValidUntil')
         }),
         ('Status and Values', {
-            'fields': ('QStatusID', 'total_value', 'GSTVATValue', 'TotalDiscount')
+            'fields': ('QStatusID', 'total_value', 'GSTVATValue', 'TotalDiscount', 'is_valid')
         }),
         ('Other Details', {
             'fields': ('CustomerEmail', 'Version', 'Remarks', 'rejection_reason')
@@ -42,6 +43,18 @@ class QuotationAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
     )
+
+    def status_with_color(self, obj):
+        colors = {
+            'Draft': 'blue',
+            'Submitted': 'orange',
+            'Approved': 'green',
+            'Rejected': 'red',
+            'Cancelled': 'gray'
+        }
+        color = colors.get(obj.QStatusID.QStatusName, 'black')
+        return format_html('<span style="color: {};">{}</span>', color, obj.QStatusID.QStatusName)
+    status_with_color.short_description = 'Status'
 
     def save_model(self, request, obj, form, change):
         if not change:
@@ -76,3 +89,13 @@ class QuotationItemDetailsAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.OrderValue = obj.OrderQuantity * obj.PricePer
         super().save_model(request, obj, form, change)
+
+    actions = ['mark_as_deleted', 'mark_as_not_deleted']
+
+    def mark_as_deleted(self, request, queryset):
+        queryset.update(IsDeleted=True)
+    mark_as_deleted.short_description = "Mark selected items as deleted"
+
+    def mark_as_not_deleted(self, request, queryset):
+        queryset.update(IsDeleted=False)
+    mark_as_not_deleted.short_description = "Mark selected items as not deleted"
