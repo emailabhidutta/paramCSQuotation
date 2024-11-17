@@ -22,11 +22,11 @@ class UserRightsAdmin(admin.ModelAdmin):
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff', 'EmployeeNo', 'Department', 'RoleID')
-    list_filter = ('is_staff', 'is_superuser', 'is_active', 'RoleID', 'Department', 'is_deleted')
+    list_filter = ('is_staff', 'is_superuser', 'IsActive', 'RoleID', 'Department', 'is_deleted')
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'EmployeeNo', 'PhoneNumber', 'Department')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Permissions', {'fields': ('IsActive', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
         ('Custom Fields', {'fields': ('RoleID', 'UserID', 'is_deleted', 'reset_password_token', 'reset_password_expires')}),
     )

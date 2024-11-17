@@ -40,6 +40,7 @@
     <Compile Include="app\migrations\__init__.py" />
     <Compile Include="company\admin.py" />
     <Compile Include="company\apps.py" />
+    <Compile Include="company\migrations\0002_add_countrycode_to_country.py" />
     <Compile Include="company\migrations\__init__.py" />
     <Compile Include="company\models.py" />
     <Compile Include="company\serializers.py" />
@@ -49,6 +50,7 @@
     <Compile Include="company\__init__.py" />
     <Compile Include="core\admin.py" />
     <Compile Include="core\apps.py" />
+    <Compile Include="core\migrations\0002_add_timestamp_fields_to_userrights.py" />
     <Compile Include="core\migrations\__init__.py" />
     <Compile Include="core\models.py" />
     <Compile Include="core\permissions.py" />

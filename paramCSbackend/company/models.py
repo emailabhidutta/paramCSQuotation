@@ -22,7 +22,7 @@ class Country(BaseModel):
 
     def save(self, *args, **kwargs):
         self.full_clean()
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.CountryName} ({self.CountryCode})"
@@ -47,7 +47,7 @@ class Company(BaseModel):
 
     def save(self, *args, **kwargs):
         self.full_clean()
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.CompanyName
@@ -72,7 +72,7 @@ class SalesOrganization(BaseModel):
 
     def save(self, *args, **kwargs):
         self.full_clean()
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.SalesOrganizationName
@@ -97,7 +97,7 @@ class AccountGroup(BaseModel):
 
     def save(self, *args, **kwargs):
         self.full_clean()
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.AccountGroupName
