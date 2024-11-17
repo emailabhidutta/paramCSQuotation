@@ -27,22 +27,21 @@ class UserProfileInline(admin.StackedInline):
 @admin.register(CustomUser)
 class CustomUserAdmin(BaseUserAdmin):
     list_display = ('Name', 'EmployeeNo', 'get_department', 'is_staff', 'RoleID', 'is_active')
-    list_filter = ('IsActive', 'RoleID', 'is_staff', 'is_superuser')
+    list_filter = ('IsActive', 'RoleID')
     fieldsets = (
-        (None, {'fields': ('Name', 'Password')}),
+        (None, {'fields': ('Name', 'password')}),
         ('Personal info', {'fields': ('EmployeeNo', 'RoleID')}),
-        ('Permissions', {'fields': ('IsActive', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Important dates', {'fields': ('last_login',)}),
+        ('Permissions', {'fields': ('IsActive',)}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('Name', 'EmployeeNo', 'RoleID', 'Password', 'IsActive', 'is_staff', 'is_superuser'),
+            'fields': ('Name', 'EmployeeNo', 'RoleID', 'password1', 'password2', 'IsActive'),
         }),
     )
     search_fields = ('Name', 'EmployeeNo')
     ordering = ('Name',)
-    filter_horizontal = ('groups', 'user_permissions',)
+    filter_horizontal = ()
     inlines = [UserProfileInline]
 
     def get_department(self, obj):
@@ -57,10 +56,10 @@ class CustomUserAdmin(BaseUserAdmin):
     def save_model(self, request, obj, form, change):
         if not change:
             # For new users, set the password
-            obj.set_password(form.cleaned_data['Password'])
-        elif 'Password' in form.changed_data:
+            obj.set_password(form.cleaned_data['password1'])
+        elif 'password' in form.changed_data:
             # If password is changed, hash it
-            obj.set_password(form.cleaned_data['Password'])
+            obj.set_password(form.cleaned_data['password'])
         super().save_model(request, obj, form, change)
 
 @admin.register(Department)
@@ -76,5 +75,4 @@ class UserProfileAdmin(admin.ModelAdmin):
     readonly_fields = ('user',)
 
 # Unregister the Group model from admin.
-# If you want to use Django's built-in permissions, you can remove this line.
 admin.site.unregister(Group)

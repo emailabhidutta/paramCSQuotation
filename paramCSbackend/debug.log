@@ -1,0 +1,64 @@
+INFO 2024-11-18 02:54:29,108 autoreload 3720 7860 Watching for file changes with StatReloader
+INFO 2024-11-18 02:54:29,108 autoreload 3720 7860 Watching for file changes with StatReloader
+DEBUG 2024-11-18 02:54:33,432 backends 3720 9192 User does not exist: admin@example.com
+DEBUG 2024-11-18 02:54:33,432 backends 3720 9192 User does not exist: admin@example.com
+INFO 2024-11-18 02:54:33,841 basehttp 3720 9192 "POST /dashboard/login/?next=/dashboard/ HTTP/1.1" 200 4338
+INFO 2024-11-18 02:54:33,841 basehttp 3720 9192 "POST /dashboard/login/?next=/dashboard/ HTTP/1.1" 200 4338
+INFO 2024-11-18 02:54:34,188 basehttp 3720 9192 "GET /static/admin/css/base.css HTTP/1.1" 200 21544
+INFO 2024-11-18 02:54:34,188 basehttp 3720 9192 "GET /static/admin/css/base.css HTTP/1.1" 200 21544
+INFO 2024-11-18 02:54:34,192 basehttp 3720 9192 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+INFO 2024-11-18 02:54:34,192 basehttp 3720 9192 "GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+INFO 2024-11-18 02:54:34,266 basehttp 3720 20644 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2024-11-18 02:54:34,266 basehttp 3720 20644 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2024-11-18 02:54:34,270 basehttp 3720 12348 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2024-11-18 02:54:34,270 basehttp 3720 12348 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2024-11-18 02:54:34,300 basehttp 3720 3244 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+INFO 2024-11-18 02:54:34,300 basehttp 3720 3244 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+INFO 2024-11-18 02:54:34,314 basehttp 3720 6548 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2024-11-18 02:54:34,314 basehttp 3720 6548 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+INFO 2024-11-18 02:54:34,346 basehttp 3720 19044 "GET /static/admin/css/login.css HTTP/1.1" 200 958
+INFO 2024-11-18 02:54:34,346 basehttp 3720 19044 "GET /static/admin/css/login.css HTTP/1.1" 200 958
+WARNING 2024-11-18 02:54:34,380 log 3720 20644 Not Found: /favicon.ico
+WARNING 2024-11-18 02:54:34,380 log 3720 20644 Not Found: /favicon.ico
+WARNING 2024-11-18 02:54:34,380 basehttp 3720 20644 "GET /favicon.ico HTTP/1.1" 404 3115
+WARNING 2024-11-18 02:54:34,380 basehttp 3720 20644 "GET /favicon.ico HTTP/1.1" 404 3115
+DEBUG 2024-11-18 02:54:41,983 backends 3720 9192 Attempting to authenticate user: paramcsadmin
+DEBUG 2024-11-18 02:54:41,983 backends 3720 9192 Attempting to authenticate user: paramcsadmin
+DEBUG 2024-11-18 02:54:42,604 backends 3720 9192 Authentication failed for user: paramcsadmin
+DEBUG 2024-11-18 02:54:42,604 backends 3720 9192 Authentication failed for user: paramcsadmin
+INFO 2024-11-18 02:54:43,251 basehttp 3720 9192 "POST /dashboard/login/?next=/dashboard/ HTTP/1.1" 200 4333
+INFO 2024-11-18 02:54:43,251 basehttp 3720 9192 "POST /dashboard/login/?next=/dashboard/ HTTP/1.1" 200 4333
+INFO 2024-11-18 02:57:19,056 autoreload 3720 7860 E:\ParamCS\paramCSQuotation\paramCSbackend\core\backends.py changed, reloading.
+INFO 2024-11-18 02:57:19,056 autoreload 3720 7860 E:\ParamCS\paramCSQuotation\paramCSbackend\core\backends.py changed, reloading.
+INFO 2024-11-18 02:57:19,920 autoreload 18944 19064 Watching for file changes with StatReloader
+INFO 2024-11-18 02:57:19,920 autoreload 18944 19064 Watching for file changes with StatReloader
+INFO 2024-11-18 03:05:51,502 autoreload 26572 22588 Watching for file changes with StatReloader
+INFO 2024-11-18 03:05:51,502 autoreload 26572 22588 Watching for file changes with StatReloader
+INFO 2024-11-18 03:05:58,725 basehttp 26572 12468 "GET /dashboard/ HTTP/1.1" 302 0
+INFO 2024-11-18 03:05:58,725 basehttp 26572 12468 "GET /dashboard/ HTTP/1.1" 302 0
+INFO 2024-11-18 03:05:58,833 basehttp 26572 12468 "GET /dashboard/login/?next=/dashboard/ HTTP/1.1" 200 4169
+INFO 2024-11-18 03:05:58,833 basehttp 26572 12468 "GET /dashboard/login/?next=/dashboard/ HTTP/1.1" 200 4169
+DEBUG 2024-11-18 03:06:06,455 backends 26572 12468 Attempting to authenticate user: paramcsadmin
+DEBUG 2024-11-18 03:06:06,455 backends 26572 12468 Attempting to authenticate user: paramcsadmin
+DEBUG 2024-11-18 03:06:06,457 backends 26572 12468 User found: paramcsadmin                                      
+DEBUG 2024-11-18 03:06:06,457 backends 26572 12468 User found: paramcsadmin                                      
+DEBUG 2024-11-18 03:06:06,457 backends 26572 12468 Is user active: True
+DEBUG 2024-11-18 03:06:06,457 backends 26572 12468 Is user active: True
+DEBUG 2024-11-18 03:06:07,305 backends 26572 12468 Password check failed for user: paramcsadmin
+DEBUG 2024-11-18 03:06:07,305 backends 26572 12468 Password check failed for user: paramcsadmin
+INFO 2024-11-18 03:06:08,112 basehttp 26572 12468 "POST /dashboard/login/?next=/dashboard/ HTTP/1.1" 200 4333
+INFO 2024-11-18 03:06:08,112 basehttp 26572 12468 "POST /dashboard/login/?next=/dashboard/ HTTP/1.1" 200 4333
+DEBUG 2024-11-18 03:25:07,222 models 17704 6772 Setting password for user paramcsadmin                                      
+DEBUG 2024-11-18 03:25:07,222 models 17704 6772 Setting password for user paramcsadmin                                      
+DEBUG 2024-11-18 03:25:07,633 models 17704 6772 New password hash: pbkdf2_sha256$720000$408pksct2TNZ53arn80ol0$ZaBJFMn3I0BVvZLoeiryaZC6/7Pl/f8C2weJyS5k8CE=
+DEBUG 2024-11-18 03:25:07,633 models 17704 6772 New password hash: pbkdf2_sha256$720000$408pksct2TNZ53arn80ol0$ZaBJFMn3I0BVvZLoeiryaZC6/7Pl/f8C2weJyS5k8CE=
+DEBUG 2024-11-18 03:25:07,633 models 17704 6772 Saving user paramcsadmin                                      
+DEBUG 2024-11-18 03:25:07,633 models 17704 6772 Saving user paramcsadmin                                      
+DEBUG 2024-11-18 03:25:07,654 models 17704 6772 User saved. Password hash: pbkdf2_sha256$720000$408pksct2TNZ53arn80ol0$ZaBJFMn3I0BVvZLoeiryaZC6/7Pl/f8C2weJyS5k8CE=
+DEBUG 2024-11-18 03:25:07,654 models 17704 6772 User saved. Password hash: pbkdf2_sha256$720000$408pksct2TNZ53arn80ol0$ZaBJFMn3I0BVvZLoeiryaZC6/7Pl/f8C2weJyS5k8CE=
+DEBUG 2024-11-18 03:25:07,654 models 17704 6772 Checking password for user: paramcsadmin                                      
+DEBUG 2024-11-18 03:25:07,654 models 17704 6772 Checking password for user: paramcsadmin                                      
+DEBUG 2024-11-18 03:25:07,654 models 17704 6772 Stored hash: pbkdf2_sha256$720000$408pksct2TNZ53arn80ol0$ZaBJFMn3I0BVvZLoeiryaZC6/7Pl/f8C2weJyS5k8CE=                                                                                                                                                                       
+DEBUG 2024-11-18 03:25:07,654 models 17704 6772 Stored hash: pbkdf2_sha256$720000$408pksct2TNZ53arn80ol0$ZaBJFMn3I0BVvZLoeiryaZC6/7Pl/f8C2weJyS5k8CE=                                                                                                                                                                       
+DEBUG 2024-11-18 03:25:08,000 models 17704 6772 Password check result: False
+DEBUG 2024-11-18 03:25:08,000 models 17704 6772 Password check result: False

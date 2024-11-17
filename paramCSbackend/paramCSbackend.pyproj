@@ -49,6 +49,10 @@
     <Compile Include="company\__init__.py" />
     <Compile Include="core\admin.py" />
     <Compile Include="core\apps.py" />
+    <Compile Include="core\backends.py" />
+    <Compile Include="core\management\commands\reset_password.py" />
+    <Compile Include="core\management\commands\test_password.py" />
+    <Compile Include="core\management\commands\verify_user.py" />
     <Compile Include="core\migrations\__init__.py" />
     <Compile Include="core\models.py" />
     <Compile Include="core\permissions.py" />
@@ -103,6 +107,8 @@
     <Folder Include="company\" />
     <Folder Include="company\migrations\" />
     <Folder Include="core\" />
+    <Folder Include="core\management\" />
+    <Folder Include="core\management\commands\" />
     <Folder Include="core\migrations\" />
     <Folder Include="core\migrations\__pycache__\" />
     <Folder Include="finance\" />
