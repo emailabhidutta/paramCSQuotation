@@ -58,7 +58,7 @@ class Quotation(models.Model):
         self.total_value -= self.TotalDiscount
         self.save()
 
-    def calculate_gst_vat(self, rate=0.1):  # 10% rate as an example
+    def calculate_gst_vat(self, rate=0.1):
         self.GSTVATValue = self.total_value * rate
         self.save()
 
@@ -73,6 +73,18 @@ class Quotation(models.Model):
             self.QStatusID = QuotationStatus.objects.get(QStatusName='Rejected')
             self.last_modified_by = rejector
             self.rejection_reason = reason
+            self.save()
+
+    def submit(self, submitter):
+        if self.QStatusID.QStatusName == 'Draft':
+            self.QStatusID = QuotationStatus.objects.get(QStatusName='Submitted')
+            self.last_modified_by = submitter
+            self.save()
+
+    def cancel(self, canceller):
+        if self.QStatusID.QStatusName not in ['Approved', 'Rejected']:
+            self.QStatusID = QuotationStatus.objects.get(QStatusName='Cancelled')
+            self.last_modified_by = canceller
             self.save()
 
     def revise(self, reviser):
@@ -115,8 +127,34 @@ class Quotation(models.Model):
         self.calculate_total_value()
 
     def save(self, *args, **kwargs):
+        if not self.QuoteId:
+            self.QuoteId = self.generate_quote_id()
+        
+        if not self.QuotationNo:
+            self.QuotationNo = self.QuoteId
+
+        if not self.QStatusID_id:
+            draft_status = QuotationStatus.objects.get(QStatusName='Draft')
+            self.QStatusID = draft_status
+
         self.full_clean()
         super().save(*args, **kwargs)
+
+    def generate_quote_id(self):
+        today = timezone.now().date()
+        prefix = f'Q{today.strftime("%y%m%d")}'
+        
+        latest_quote = Quotation.objects.filter(QuoteId__startswith=prefix).order_by('-QuoteId').first()
+        
+        if latest_quote:
+            latest_number = int(latest_quote.QuoteId[7:])
+            new_number = latest_number + 1
+        else:
+            new_number = 1
+        
+        new_number_str = f'{new_number:02d}'
+        
+        return f'{prefix}{new_number_str}'
 
 class QuotationDetails(models.Model):
     QuotationDetailsId = models.AutoField(primary_key=True)

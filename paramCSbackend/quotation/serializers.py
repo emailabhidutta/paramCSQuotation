@@ -38,6 +38,9 @@ class QuotationSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # Add any custom validation here
+        if data.get('QuoteValidFrom') and data.get('QuoteValidUntil'):
+            if data['QuoteValidFrom'] > data['QuoteValidUntil']:
+                raise serializers.ValidationError("QuoteValidFrom must be before QuoteValidUntil")
         return data
 
     @transaction.atomic
@@ -48,20 +51,12 @@ class QuotationSerializer(serializers.ModelSerializer):
         validated_data['last_modified_by'] = user
         quotation = Quotation.objects.create(**validated_data)
 
-        details_to_create = []
-        items_to_create = []
-
         for detail_data in details_data:
             items_data = detail_data.pop('items', [])
-            detail = QuotationDetails(QuoteId=quotation, **detail_data)
-            details_to_create.append(detail)
+            detail = QuotationDetails.objects.create(QuoteId=quotation, **detail_data)
 
             for item_data in items_data:
-                item = QuotationItemDetails(QuotationDetailsId=detail, **item_data)
-                items_to_create.append(item)
-
-        QuotationDetails.objects.bulk_create(details_to_create)
-        QuotationItemDetails.objects.bulk_create(items_to_create)
+                QuotationItemDetails.objects.create(QuotationDetailsId=detail, **item_data)
 
         quotation.calculate_total_value()
         return quotation
@@ -77,23 +72,18 @@ class QuotationSerializer(serializers.ModelSerializer):
         instance.save()
 
         existing_details = {detail.QuotationDetailsId: detail for detail in instance.quotationdetails_set.all()}
-        details_to_create = []
-        details_to_update = []
-        items_to_create = []
-        items_to_update = []
-
+        
         for detail_data in details_data:
             items_data = detail_data.pop('items', [])
             detail_id = detail_data.get('QuotationDetailsId')
 
             if detail_id and detail_id in existing_details:
-                detail = existing_details[detail_id]
+                detail = existing_details.pop(detail_id)
                 for attr, value in detail_data.items():
                     setattr(detail, attr, value)
-                details_to_update.append(detail)
+                detail.save()
             else:
-                detail = QuotationDetails(QuoteId=instance, **detail_data)
-                details_to_create.append(detail)
+                detail = QuotationDetails.objects.create(QuoteId=instance, **detail_data)
 
             existing_items = {item.QuoteItemId: item for item in detail.quotationitemdetails_set.all()}
             
@@ -101,18 +91,36 @@ class QuotationSerializer(serializers.ModelSerializer):
                 item_id = item_data.get('QuoteItemId')
 
                 if item_id and item_id in existing_items:
-                    item = existing_items[item_id]
+                    item = existing_items.pop(item_id)
                     for attr, value in item_data.items():
                         setattr(item, attr, value)
-                    items_to_update.append(item)
+                    item.save()
                 else:
-                    item = QuotationItemDetails(QuotationDetailsId=detail, **item_data)
-                    items_to_create.append(item)
+                    QuotationItemDetails.objects.create(QuotationDetailsId=detail, **item_data)
 
-        QuotationDetails.objects.bulk_create(details_to_create)
-        QuotationDetails.objects.bulk_update(details_to_update, fields=[f.name for f in QuotationDetails._meta.fields if f.name != 'QuotationDetailsId'])
-        QuotationItemDetails.objects.bulk_create(items_to_create)
-        QuotationItemDetails.objects.bulk_update(items_to_update, fields=[f.name for f in QuotationItemDetails._meta.fields if f.name != 'QuoteItemId'])
+            # Soft delete remaining items
+            for item in existing_items.values():
+                item.IsDeleted = True
+                item.save()
+
+        # Soft delete remaining details
+        for detail in existing_details.values():
+            detail.IsDeleted = True
+            detail.save()
 
         instance.calculate_total_value()
         return instance
+
+class QuotationListSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(source='QStatusID.QStatusName', read_only=True)
+    customer_name = serializers.CharField(source='quotationdetails_set.first.CustomerName', read_only=True)
+
+    class Meta:
+        model = Quotation
+        fields = ['QuoteId', 'QuotationNo', 'CustomerNumber', 'customer_name', 'Date', 'CreationDate', 'status', 'total_value']
+
+class QuotationSummarySerializer(serializers.Serializer):
+    total_quotations = serializers.IntegerField()
+    quotation_status = serializers.ListField(child=serializers.DictField())
+    recent_quotations = serializers.ListField(child=serializers.DictField())
+    total_value = serializers.DecimalField(max_digits=15, decimal_places=2)

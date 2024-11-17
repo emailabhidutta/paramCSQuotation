@@ -14,6 +14,12 @@ from .serializers import (
     QuotationItemDetailsSerializer
 )
 from core.permissions import IsAdminUser, IsSalesManager, IsSalesUser
+from .services import (
+    create_quotation, update_quotation, submit_quotation, 
+    approve_quotation, reject_quotation, cancel_quotation, 
+    revise_quotation, delete_quotation_item,
+    get_customer_details, get_item_rates, get_material_details
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -69,34 +75,9 @@ class QuotationViewSet(viewsets.ModelViewSet):
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         try:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            quotation = serializer.save(created_by=request.user, last_modified_by=request.user)
-            headers = self.get_success_headers(serializer.data)
-            
-            details_data = request.data.get('details', [])
-            details_to_create = []
-            items_to_create = []
-
-            for detail in details_data:
-                detail['QuoteId'] = quotation.QuoteId
-                detail_serializer = QuotationDetailsSerializer(data=detail)
-                detail_serializer.is_valid(raise_exception=True)
-                details_to_create.append(QuotationDetails(**detail_serializer.validated_data))
-
-            created_details = QuotationDetails.objects.bulk_create(details_to_create)
-
-            for detail, created_detail in zip(details_data, created_details):
-                items_data = detail.get('items', [])
-                for item in items_data:
-                    item['QuotationDetailsId'] = created_detail.QuotationDetailsId
-                    item_serializer = QuotationItemDetailsSerializer(data=item)
-                    item_serializer.is_valid(raise_exception=True)
-                    items_to_create.append(QuotationItemDetails(**item_serializer.validated_data))
-
-            QuotationItemDetails.objects.bulk_create(items_to_create)
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+            quotation = create_quotation(request.data, request.user)
+            serializer = self.get_serializer(quotation)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         except serializers.ValidationError as e:
             return Response({'error': 'Validation error', 'details': e.detail}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -106,39 +87,9 @@ class QuotationViewSet(viewsets.ModelViewSet):
     @transaction.atomic
     def update(self, request, *args, **kwargs):
         try:
-            partial = kwargs.pop('partial', False)
             instance = self.get_object()
-            serializer = self.get_serializer(instance, data=request.data, partial=partial)
-            serializer.is_valid(raise_exception=True)
-            self.perform_update(serializer)
-
-            if getattr(instance, '_prefetched_objects_cache', None):
-                instance._prefetched_objects_cache = {}
-
-            details_data = request.data.get('details', [])
-            for detail in details_data:
-                if 'QuotationDetailsId' in detail:
-                    detail_instance = QuotationDetails.objects.get(QuotationDetailsId=detail['QuotationDetailsId'])
-                    detail_serializer = QuotationDetailsSerializer(detail_instance, data=detail, partial=True)
-                else:
-                    detail['QuoteId'] = instance.QuoteId
-                    detail_serializer = QuotationDetailsSerializer(data=detail)
-                
-                detail_serializer.is_valid(raise_exception=True)
-                detail_instance = detail_serializer.save()
-
-                items_data = detail.get('items', [])
-                for item in items_data:
-                    if 'QuoteItemId' in item:
-                        item_instance = QuotationItemDetails.objects.get(QuoteItemId=item['QuoteItemId'])
-                        item_serializer = QuotationItemDetailsSerializer(item_instance, data=item, partial=True)
-                    else:
-                        item['QuotationDetailsId'] = detail_instance.QuotationDetailsId
-                        item_serializer = QuotationItemDetailsSerializer(data=item)
-                    
-                    item_serializer.is_valid(raise_exception=True)
-                    item_serializer.save()
-
+            updated_quotation = update_quotation(instance, request.data, request.user)
+            serializer = self.get_serializer(updated_quotation)
             return Response(serializer.data)
         except serializers.ValidationError as e:
             return Response({'error': 'Validation error', 'details': e.detail}, status=status.HTTP_400_BAD_REQUEST)
@@ -146,15 +97,23 @@ class QuotationViewSet(viewsets.ModelViewSet):
             logger.error(f"Unexpected error in update: {str(e)}")
             return Response({'error': 'An unexpected error occurred', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def perform_update(self, serializer):
-        serializer.save(last_modified_by=self.request.user)
+    @action(detail=True, methods=['post'])
+    def submit(self, request, pk=None):
+        quotation = self.get_object()
+        try:
+            submitted_quotation = submit_quotation(quotation, request.user)
+            serializer = self.get_serializer(submitted_quotation)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'])
     def approve(self, request, pk=None):
         quotation = self.get_object()
         try:
-            quotation.approve(request.user)
-            return Response({'status': 'quotation approved'})
+            approved_quotation = approve_quotation(quotation, request.user)
+            serializer = self.get_serializer(approved_quotation)
+            return Response(serializer.data)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -163,8 +122,19 @@ class QuotationViewSet(viewsets.ModelViewSet):
         quotation = self.get_object()
         reason = request.data.get('reason', '')
         try:
-            quotation.reject(request.user, reason)
-            return Response({'status': 'quotation rejected'})
+            rejected_quotation = reject_quotation(quotation, request.user, reason)
+            serializer = self.get_serializer(rejected_quotation)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        quotation = self.get_object()
+        try:
+            cancelled_quotation = cancel_quotation(quotation, request.user)
+            serializer = self.get_serializer(cancelled_quotation)
+            return Response(serializer.data)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -172,8 +142,39 @@ class QuotationViewSet(viewsets.ModelViewSet):
     def revise(self, request, pk=None):
         quotation = self.get_object()
         try:
-            quotation.revise(request.user)
-            return Response({'status': 'quotation revised'})
+            revised_quotation = revise_quotation(quotation, request.user)
+            serializer = self.get_serializer(revised_quotation)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def get_customer_details(self, request):
+        search_term = request.query_params.get('search_term', '')
+        try:
+            customer_details = get_customer_details(search_term)
+            return Response(customer_details)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def get_item_rates(self, request):
+        customer_number = request.query_params.get('customer_number', '')
+        material_number = request.query_params.get('material_number', '')
+        sales_org = request.query_params.get('sales_org', '')
+        distribution_channel = request.query_params.get('distribution_channel', '')
+        try:
+            item_rates = get_item_rates(customer_number, material_number, sales_org, distribution_channel)
+            return Response(item_rates)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def get_material_details(self, request):
+        material_number = request.query_params.get('material_number', '')
+        try:
+            material_details = get_material_details(material_number)
+            return Response(material_details)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -198,6 +199,8 @@ class QuotationItemDetailsViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def soft_delete(self, request, pk=None):
         item = self.get_object()
-        item.IsDeleted = True
-        item.save()
-        return Response({'status': 'item soft deleted'})
+        try:
+            delete_quotation_item(item.QuotationDetailsId.QuoteId, item.QuoteItemId)
+            return Response({'status': 'item soft deleted'})
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

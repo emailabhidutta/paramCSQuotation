@@ -85,6 +85,7 @@
     <Compile Include="quotation\migrations\__init__.py" />
     <Compile Include="quotation\models.py" />
     <Compile Include="quotation\serializers.py" />
+    <Compile Include="quotation\services.py" />
     <Compile Include="quotation\tests.py" />
     <Compile Include="quotation\test_quotation.py" />
     <Compile Include="quotation\urls.py" />
