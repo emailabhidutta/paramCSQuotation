@@ -20,9 +20,10 @@ class CurrencyExchange(models.Model):
     ExchangeFactor = models.DecimalField(
         max_digits=10, 
         decimal_places=4, 
-        validators=[MinValueValidator(0.0001)]
+        validators=[MinValueValidator(0.0001)],
+        default=1
     )
-    EffectiveDate = models.DateField()
+    EffectiveDate = models.DateField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.FromCurrencyID} to {self.ToCurrencyID}: {self.ExchangeFactor}"
@@ -30,7 +31,7 @@ class CurrencyExchange(models.Model):
     class Meta:
         verbose_name = "Currency Exchange Rate"
         verbose_name_plural = "Currency Exchange Rates"
-        unique_together = ('FromCurrencyID', 'ToCurrencyID', 'EffectiveDate')
+        unique_together = ('FromCurrencyID', 'ToCurrencyID')
 
     def clean(self):
         if self.FromCurrencyID == self.ToCurrencyID:

@@ -11,7 +11,8 @@ from .models import Role, Rights, UserRights, CustomUser
 from .serializers import (
     RoleSerializer, RightsSerializer, UserRightsSerializer, 
     CustomUserSerializer, CustomUserListSerializer, CustomUserDetailSerializer,
-    ChangePasswordSerializer, ResetPasswordSerializer, SetNewPasswordSerializer
+    ChangePasswordSerializer, ResetPasswordSerializer, SetNewPasswordSerializer,
+    LoginSerializer
 )
 from .permissions import IsAdminUser, IsSalesManager, IsSalesUser, IsAdminOrSalesManager, HasRightPermission
 import logging
@@ -21,6 +22,8 @@ from datetime import timedelta
 logger = logging.getLogger(__name__)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = LoginSerializer
+
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
         logger.info(f"Login attempt for user: {username}")
@@ -66,8 +69,8 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     serializer_class = CustomUserSerializer
     permission_classes = [IsAdminUser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['username', 'email', 'is_active', 'RoleID', 'Department']
-    search_fields = ['username', 'email', 'first_name', 'last_name', 'EmployeeNo']
+    filterset_fields = ['username', 'email', 'IsActive', 'RoleID', 'Department']
+    search_fields = ['username', 'email', 'Name', 'EmployeeNo']
     ordering_fields = ['username', 'date_joined', 'last_login']
 
     def get_permissions(self):
@@ -96,14 +99,14 @@ class CustomUserViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def activate(self, request, pk=None):
         user = self.get_object()
-        user.is_active = True
+        user.IsActive = '1'
         user.save()
         return Response({'status': 'user activated'})
 
     @action(detail=True, methods=['post'])
     def deactivate(self, request, pk=None):
         user = self.get_object()
-        user.is_active = False
+        user.IsActive = '0'
         user.save()
         return Response({'status': 'user deactivated'})
 

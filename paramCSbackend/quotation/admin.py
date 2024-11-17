@@ -16,7 +16,7 @@ class QuotationItemDetailsInline(admin.TabularInline):
 class QuotationDetailsInline(admin.StackedInline):
     model = QuotationDetails
     extra = 1
-    fields = ('QuoteRevisionNo', 'SalesOrganization', 'Customer', 'ShipToCustomerNumber', 'TradingCurrency', 'DeliveryDate')
+    fields = ('QuoteRevisionNo', 'SalesOrganization', 'SoldToCustomerNumber', 'ShipToCustomerNumber', 'TradingCurrency', 'DeliveryDate')
 
 @admin.register(Quotation)
 class QuotationAdmin(admin.ModelAdmin):
@@ -74,9 +74,9 @@ class QuotationAdmin(admin.ModelAdmin):
 
 @admin.register(QuotationDetails)
 class QuotationDetailsAdmin(admin.ModelAdmin):
-    list_display = ('QuotationDetailsId', 'QuoteId', 'QuoteRevisionNo', 'SalesOrganization', 'Customer')
+    list_display = ('QuotationDetailsId', 'QuoteId', 'QuoteRevisionNo', 'SalesOrganization', 'SoldToCustomerNumber')
     list_filter = ('SalesOrganization', 'ApprovalStatus')
-    search_fields = ('QuotationDetailsId', 'QuoteId__QuotationNo', 'Customer')
+    search_fields = ('QuotationDetailsId', 'QuoteId__QuotationNo', 'SoldToCustomerNumber')
     inlines = [QuotationItemDetailsInline]
 
 @admin.register(QuotationItemDetails)

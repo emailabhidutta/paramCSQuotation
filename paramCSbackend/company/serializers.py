@@ -6,7 +6,7 @@ class CountrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Country
-        fields = ['CountryID', 'CountryName', 'CountryCode', 'company_count', 'created_at', 'updated_at']
+        fields = ['CountryID', 'CountryName', 'CountryCode', 'SalesOrganizationID', 'company_count']
 
     def get_company_count(self, obj):
         return obj.companies.count()
@@ -18,7 +18,7 @@ class CompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        fields = ['CompanyID', 'CompanyName', 'CountryID', 'country_name', 'country_code', 'IsActive', 'sales_organization_count', 'created_at', 'updated_at']
+        fields = ['CompanyID', 'CompanyName', 'CountryID', 'country_name', 'country_code', 'sales_organization_count']
 
     def get_sales_organization_count(self, obj):
         return obj.sales_organizations.count()
@@ -34,7 +34,7 @@ class SalesOrganizationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SalesOrganization
-        fields = ['SalesOrganizationID', 'SalesOrganizationName', 'CompanyID', 'company_name', 'IsActive', 'account_group_count', 'created_at', 'updated_at']
+        fields = ['SalesOrganizationID', 'SalesOrganizationName', 'CompanyID', 'company_name', 'account_group_count']
 
     def get_account_group_count(self, obj):
         return obj.account_groups.count()
@@ -50,7 +50,7 @@ class AccountGroupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AccountGroup
-        fields = ['AccountGroupID', 'AccountGroupName', 'SalesOrganizationID', 'sales_organization_name', 'company_name', 'IsActive', 'created_at', 'updated_at']
+        fields = ['AccountGroupID', 'AccountGroupName', 'SalesOrganizationID', 'sales_organization_name', 'company_name']
 
     def get_company_name(self, obj):
         return obj.SalesOrganizationID.CompanyID.CompanyName
@@ -77,3 +77,30 @@ class SalesOrganizationDetailSerializer(SalesOrganizationSerializer):
 
     class Meta(SalesOrganizationSerializer.Meta):
         fields = SalesOrganizationSerializer.Meta.fields + ['account_groups']
+
+# New serializers for list views
+class CountryListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ['CountryID', 'CountryName', 'CountryCode']
+
+class CompanyListSerializer(serializers.ModelSerializer):
+    country_name = serializers.CharField(source='CountryID.CountryName', read_only=True)
+
+    class Meta:
+        model = Company
+        fields = ['CompanyID', 'CompanyName', 'country_name']
+
+class SalesOrganizationListSerializer(serializers.ModelSerializer):
+    company_name = serializers.CharField(source='CompanyID.CompanyName', read_only=True)
+
+    class Meta:
+        model = SalesOrganization
+        fields = ['SalesOrganizationID', 'SalesOrganizationName', 'company_name']
+
+class AccountGroupListSerializer(serializers.ModelSerializer):
+    sales_organization_name = serializers.CharField(source='SalesOrganizationID.SalesOrganizationName', read_only=True)
+
+    class Meta:
+        model = AccountGroup
+        fields = ['AccountGroupID', 'AccountGroupName', 'sales_organization_name']

@@ -11,7 +11,9 @@ from .serializers import (
     QuotationStatusSerializer, 
     QuotationSerializer, 
     QuotationDetailsSerializer, 
-    QuotationItemDetailsSerializer
+    QuotationItemDetailsSerializer,
+    QuotationListSerializer,
+    QuotationSummarySerializer
 )
 from core.permissions import IsAdminUser, IsSalesManager, IsSalesUser
 from .services import (
@@ -34,20 +36,21 @@ def dashboard_view(request):
                                 .annotate(count=Count('QuoteId'))
                                 .order_by('QStatusID__QStatusName'))
         
-        recent_quotations = list(Quotation.objects.annotate(
-            creation_date=TruncDate('CreationDate')
-        ).order_by('-CreationDate')[:5].values(
-            'QuoteId', 'QuotationNo', 'CustomerNumber', 'creation_date'
+        recent_quotations = list(Quotation.objects.order_by('-CreationDate')[:5].values(
+            'QuoteId', 'QuotationNo', 'CustomerNumber', 'CreationDate'
         ))
         
         total_value = QuotationItemDetails.objects.aggregate(total=Sum('OrderValue'))['total'] or 0
 
-        return Response({
+        summary_data = {
             'total_quotations': total_quotations,
             'quotation_status': quotation_status,
             'recent_quotations': recent_quotations,
             'total_value': total_value
-        })
+        }
+        
+        serializer = QuotationSummarySerializer(summary_data)
+        return Response(serializer.data)
     except Exception as e:
         logger.error(f"Unexpected error in dashboard_view: {str(e)}")
         return Response({'error': 'An unexpected error occurred', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -64,6 +67,11 @@ class QuotationViewSet(viewsets.ModelViewSet):
     filterset_fields = ['CustomerNumber', 'CreationDate', 'QStatusID']
     search_fields = ['QuotationNo', 'CustomerNumber']
     ordering_fields = ['CreationDate', 'QuotationNo']
+
+    def get_serializer_class(self):
+        if self.action == 'list':
+            return QuotationListSerializer
+        return QuotationSerializer
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -183,8 +191,8 @@ class QuotationDetailsViewSet(viewsets.ModelViewSet):
     serializer_class = QuotationDetailsSerializer
     permission_classes = [IsSalesUser | IsSalesManager | IsAdminUser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['QuoteId', 'SalesOrganization', 'Customer']
-    search_fields = ['Customer']
+    filterset_fields = ['QuoteId', 'SalesOrganization', 'SoldToCustomerNumber']
+    search_fields = ['CustomerName']
     ordering_fields = ['QuoteRevisionDate']
 
 class QuotationItemDetailsViewSet(viewsets.ModelViewSet):

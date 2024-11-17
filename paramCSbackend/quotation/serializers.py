@@ -15,7 +15,7 @@ class QuotationItemDetailsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class QuotationDetailsSerializer(serializers.ModelSerializer):
-    items = QuotationItemDetailsSerializer(many=True, read_only=True, source='quotationitemdetails_set')
+    items = QuotationItemDetailsSerializer(many=True, read_only=True)
     SalesOrganization = SalesOrganizationSerializer(read_only=True)
 
     class Meta:
@@ -23,7 +23,7 @@ class QuotationDetailsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class QuotationSerializer(serializers.ModelSerializer):
-    details = QuotationDetailsSerializer(many=True, read_only=True, source='quotationdetails_set')
+    details = QuotationDetailsSerializer(many=True, read_only=True)
     QStatusID = QuotationStatusSerializer(read_only=True)
     created_by = CustomUserSerializer(read_only=True)
     last_modified_by = CustomUserSerializer(read_only=True)
@@ -37,7 +37,6 @@ class QuotationSerializer(serializers.ModelSerializer):
         read_only_fields = ('total_value', 'created_by', 'last_modified_by', 'Date', 'CreationDate')
 
     def validate(self, data):
-        # Add any custom validation here
         if data.get('QuoteValidFrom') and data.get('QuoteValidUntil'):
             if data['QuoteValidFrom'] > data['QuoteValidUntil']:
                 raise serializers.ValidationError("QuoteValidFrom must be before QuoteValidUntil")
@@ -71,7 +70,7 @@ class QuotationSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
 
-        existing_details = {detail.QuotationDetailsId: detail for detail in instance.quotationdetails_set.all()}
+        existing_details = {detail.QuotationDetailsId: detail for detail in instance.details.all()}
         
         for detail_data in details_data:
             items_data = detail_data.pop('items', [])
@@ -85,7 +84,7 @@ class QuotationSerializer(serializers.ModelSerializer):
             else:
                 detail = QuotationDetails.objects.create(QuoteId=instance, **detail_data)
 
-            existing_items = {item.QuoteItemId: item for item in detail.quotationitemdetails_set.all()}
+            existing_items = {item.QuoteItemId: item for item in detail.items.all()}
             
             for item_data in items_data:
                 item_id = item_data.get('QuoteItemId')
@@ -98,12 +97,12 @@ class QuotationSerializer(serializers.ModelSerializer):
                 else:
                     QuotationItemDetails.objects.create(QuotationDetailsId=detail, **item_data)
 
-            # Soft delete remaining items
+            # Mark remaining items as deleted
             for item in existing_items.values():
                 item.IsDeleted = True
                 item.save()
 
-        # Soft delete remaining details
+        # Mark remaining details as deleted
         for detail in existing_details.values():
             detail.IsDeleted = True
             detail.save()
@@ -113,11 +112,15 @@ class QuotationSerializer(serializers.ModelSerializer):
 
 class QuotationListSerializer(serializers.ModelSerializer):
     status = serializers.CharField(source='QStatusID.QStatusName', read_only=True)
-    customer_name = serializers.CharField(source='quotationdetails_set.first.CustomerName', read_only=True)
+    customer_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Quotation
         fields = ['QuoteId', 'QuotationNo', 'CustomerNumber', 'customer_name', 'Date', 'CreationDate', 'status', 'total_value']
+
+    def get_customer_name(self, obj):
+        detail = obj.details.first()
+        return detail.CustomerName if detail else None
 
 class QuotationSummarySerializer(serializers.Serializer):
     total_quotations = serializers.IntegerField()
