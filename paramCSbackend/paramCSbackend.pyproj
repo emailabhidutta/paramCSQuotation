@@ -40,7 +40,6 @@
     <Compile Include="app\migrations\__init__.py" />
     <Compile Include="company\admin.py" />
     <Compile Include="company\apps.py" />
-    <Compile Include="company\migrations\0002_add_countrycode_to_country.py" />
     <Compile Include="company\migrations\__init__.py" />
     <Compile Include="company\models.py" />
     <Compile Include="company\serializers.py" />
@@ -50,7 +49,6 @@
     <Compile Include="company\__init__.py" />
     <Compile Include="core\admin.py" />
     <Compile Include="core\apps.py" />
-    <Compile Include="core\migrations\0002_add_timestamp_fields_to_userrights.py" />
     <Compile Include="core\migrations\__init__.py" />
     <Compile Include="core\models.py" />
     <Compile Include="core\permissions.py" />
@@ -117,15 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="core\migrations\__pycache__\0001_initial.cpython-312.pyc" />
-    <Content Include="core\migrations\__pycache__\0001_initial.cpython-313.pyc" />
-    <Content Include="core\migrations\__pycache__\0002_remove_customuser_name_remove_customuser_password_and_more.cpython-313.pyc" />
-    <Content Include="core\migrations\__pycache__\0003_remove_customuser_id_remove_customuser_user_and_more.cpython-313.pyc" />
-    <Content Include="core\migrations\__pycache__\0004_customuser_name_customuser_user.cpython-313.pyc" />
-    <Content Include="core\migrations\__pycache__\0005_remove_customuser_password.cpython-313.pyc" />
-    <Content Include="core\migrations\__pycache__\0006_remove_customuser_name_customuser_id_and_more.cpython-313.pyc" />
-    <Content Include="core\migrations\__pycache__\0007_update_customuser_model.cpython-313.pyc" />
     <Content Include="core\migrations\__pycache__\__init__.cpython-312.pyc" />
-    <Content Include="core\migrations\__pycache__\__init__.cpython-313.pyc" />
     <Content Include="requirements.txt" />
     <Content Include="db.sqlite3" />
     <Content Include="app\static\app\content\bootstrap.css" />
